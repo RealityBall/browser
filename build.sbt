@@ -1,3 +1,5 @@
+import com.typesafe.sbt.SbtStartScript
+
 name := "MLB"
 
 version := "1.0"
@@ -9,6 +11,8 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 resolvers += "Spray" at "http://repo.spray.io"
 
 lazy val root = (project in file(".")).enablePlugins(SbtTwirl)
+
+seq(SbtStartScript.startScriptForClassesSettings: _*)
 
 libraryDependencies ++= {
   val sprayV = "1.3.2"
