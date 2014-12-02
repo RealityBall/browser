@@ -105,6 +105,7 @@ object MlbServer extends App with MySslConfiguration {
 
     val server = system.actorOf(WebSocketServer.props(), "websocket")
 
+    println("STARTING")
     //IO(UHttp) ? Http.Bind(server, "localhost", 8110)
     IO(UHttp) ? Http.Bind(server, "0.0.0.0", args(0).toInt)
 
