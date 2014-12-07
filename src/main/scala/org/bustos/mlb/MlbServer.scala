@@ -82,11 +82,11 @@ object MlbServer extends App with MySslConfiguration {
             val playerStr = player.getOrElse("")   
             respondWithMediaType(`text/html`) {
               if (!teamStr.isEmpty) { 
-                complete(html.graph.render("", retrosheetData.teams, retrosheetData.players(teamStr), retrosheetData.playerBA("")).toString)
+                complete(html.graph.render("", retrosheetData.teams, retrosheetData.players(teamStr), List(), List(), List()).toString)
               } else if (!playerStr.isEmpty) {
-                complete(html.graph.render(playerStr, retrosheetData.teams, retrosheetData.players(teamStr), retrosheetData.playerBA(playerStr)).toString)
+                complete(html.graph.render(playerStr, retrosheetData.teams, retrosheetData.players(teamStr), retrosheetData.playerBA(playerStr), retrosheetData.playerMovingBA(playerStr), retrosheetData.playerVolatilityBA(playerStr)).toString)
               } else {
-                complete(html.graph.render("", retrosheetData.teams, retrosheetData.players(""), retrosheetData.playerBA("")).toString)
+                complete(html.graph.render("", retrosheetData.teams, List(), List(), List(), List()).toString)
               }
             }
           }
@@ -105,9 +105,8 @@ object MlbServer extends App with MySslConfiguration {
 
     val server = system.actorOf(WebSocketServer.props(), "websocket")
 
-    println("STARTING")
-    //IO(UHttp) ? Http.Bind(server, "localhost", 8110)
-    IO(UHttp) ? Http.Bind(server, "0.0.0.0", args(0).toInt)
+    IO(UHttp) ? Http.Bind(server, "localhost", 8110)
+    //IO(UHttp) ? Http.Bind(server, "0.0.0.0", args(0).toInt)
 
   }
 

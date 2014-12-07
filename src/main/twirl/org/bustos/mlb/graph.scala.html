@@ -1,5 +1,7 @@
 @import _root_.org.bustos.mlb.RetrosheetData._
-@(player: String, teams: List[String], players: List[String], observations: List[BattingAverageObservation])
+@(player: String, teams: List[String], players: List[(String,String)],
+observations: List[BattingAverageObservation],movingObservations:
+List[BattingAverageObservation], volatilityObservations: List[BattingAverageObservation])
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -34,15 +36,46 @@
 		  	  ['@observations.last.date', @observations.last.bAvg, @observations.last.lhBAvg, @observations.last.rhBAvg]
           }
         ]);
-
         var options = {
           title: 'Batting Averages for @player'
         };
-
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
+        var chart = new google.visualization.LineChart(document.getElementById('chart_ba'));
         chart.draw(data, options);
-      }
+
+        var data = google.visualization.arrayToDataTable([
+          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
+          @if(observations.isEmpty){
+        	  [0, 0.0, 0.0, 0.0]
+          }else{
+	          @for(observation <- movingObservations) {
+    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
+	          }
+		  	  ['@observations.last.date', @observations.last.bAvg, @observations.last.lhBAvg, @observations.last.rhBAvg]
+          }
+        ]);
+        var options = {
+          title: '25 Day Batting Averages for @player'
+        };
+        var chart = new google.visualization.LineChart(document.getElementById('chart_movingba'));
+        chart.draw(data, options);
+
+        var data = google.visualization.arrayToDataTable([
+          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
+          @if(observations.isEmpty){
+        	  [0, 0.0, 0.0, 0.0]
+          }else{
+	          @for(observation <- volatilityObservations) {
+    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
+	          }
+		  	  ['@observations.last.date', @observations.last.bAvg, @observations.last.lhBAvg, @observations.last.rhBAvg]
+          }
+        ]);
+        var options = {
+          title: '100 Day Batting Average Volatiltiy for @player'
+        };
+        var chart = new google.visualization.LineChart(document.getElementById('chart_volatilityba'));
+        chart.draw(data, options);
+    }
     </script>
   </head>
   <body>
@@ -70,14 +103,16 @@
 	            </a>
 	            <ul class="dropdown-menu">
 	               @for(player<-players) {
-	               	<li><a href="graph?player=@player">@player</a>
+	               	<li><a href="graph?player=@player._2">@player._1</a>
 	               }
 	            </ul>
 	         </li>
 	      </ul>
 	   </div>
 	</nav>
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <div id="chart_ba" style="width: 900px; height: 500px;"></div>
+    <div id="chart_movingba" style="width: 900px; height: 500px;"></div>
+    <div id="chart_volatilityba" style="width: 900px; height: 500px;"></div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>

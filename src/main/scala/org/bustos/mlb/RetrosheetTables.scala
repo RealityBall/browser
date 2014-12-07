@@ -72,7 +72,7 @@ class HitterRawRHStatsTable(tag: Tag)
     (date, playerID, RHatBat, RHsingle, RHdouble, RHtriple, RHhomeRun, RHRBI, RHbaseOnBalls, RHhitByPitch, RHsacFly, RHsacHit)
 }
 
-class HitterStatsTable(tag: Tag)
+class HitterDailyStatsTable(tag: Tag)
   extends Table[(String, String, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)](tag, "hitterDailyStats") {
 
   def date: Column[String] = column[String]("date")
@@ -96,5 +96,57 @@ class HitterStatsTable(tag: Tag)
       RHbattingAverage, LHbattingAverage, battingAverage,  
       RHonBasePercentage, LHonBasePercentage, onBasePercentage, RHsluggingPercentage, LHsluggingPercentage,
       sluggingPercentage, RHfantasyScore, LHfantasyScore, fantasyScore)
+}
+
+class HitterStatsMovingTable(tag: Tag)
+  extends Table[(String, String, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)](tag, "hitterMovingStats") {
+
+  def date: Column[String] = column[String]("date")
+  def playerID: Column[String] = column[String]("playerID")
+  def RHbattingAverage25: Column[Double] = column[Double]("RHbattingAverage25")
+  def LHbattingAverage25: Column[Double] = column[Double]("LHbattingAverage25")
+  def battingAverage25: Column[Double] = column[Double]("battingAverage25")
+  def RHonBasePercentage25: Column[Double] = column[Double]("RHonBasePercentage25")
+  def LHonBasePercentage25: Column[Double] = column[Double]("LHonBasePercentage25")
+  def onBasePercentage25: Column[Double] = column[Double]("onBasePercentage25")
+  def RHsluggingPercentage25: Column[Double] = column[Double]("RHsluggingPercentage25")
+  def LHsluggingPercentage25: Column[Double] = column[Double]("LHsluggingPercentage25")
+  def sluggingPercentage25: Column[Double] = column[Double]("sluggingPercentage25")
+  def RHfantasyScore25: Column[Double] = column[Double]("RHfantasyScore25")
+  def LHfantasyScore25: Column[Double] = column[Double]("LHfantasyScore25")
+  def fantasyScore25: Column[Double] = column[Double]("fantasyScore25")
+
+  // Every table needs a * projection with the same type as the table's type parameter
+  def * : ProvenShape[(String, String, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] =
+    (date, playerID, 
+      RHbattingAverage25, LHbattingAverage25, battingAverage25,  
+      RHonBasePercentage25, LHonBasePercentage25, onBasePercentage25, RHsluggingPercentage25, LHsluggingPercentage25,
+      sluggingPercentage25, RHfantasyScore25, LHfantasyScore25, fantasyScore25)
+}
+
+class HitterStatsVolatilityTable(tag: Tag)
+  extends Table[(String, String, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)](tag, "hitterVolatilityStats") {
+
+  def date: Column[String] = column[String]("date")
+  def playerID: Column[String] = column[String]("playerID")
+  def RHbattingVolatility100: Column[Double] = column[Double]("RHbattingVolatility100")
+  def LHbattingVolatility100: Column[Double] = column[Double]("LHbattingVolatility100")
+  def battingVolatility100: Column[Double] = column[Double]("battingVolatility100")
+  def RHonBaseVolatility100: Column[Double] = column[Double]("RHonBaseVolatility100")
+  def LHonBaseVolatility100: Column[Double] = column[Double]("LHonBaseVolatility100")
+  def onBaseVolatility100: Column[Double] = column[Double]("onBaseVolatility100")
+  def RHsluggingVolatility100: Column[Double] = column[Double]("RHsluggingVolatility100")
+  def LHsluggingVolatility100: Column[Double] = column[Double]("LHsluggingVolatility100")
+  def sluggingVolatility100: Column[Double] = column[Double]("sluggingVolatility100")
+  def RHfantasyScoreVolatility100: Column[Double] = column[Double]("RHfantasyScoreVolatility100")
+  def LHfantasyScoreVolatility100: Column[Double] = column[Double]("LHfantasyScoreVolatility100")
+  def fantasyScoreVolatility100: Column[Double] = column[Double]("fantasyScoreVolatility100")
+
+  // Every table needs a * projection with the same type as the table's type parameter
+  def * : ProvenShape[(String, String, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] =
+    (date, playerID, 
+      RHbattingVolatility100, LHbattingVolatility100, battingVolatility100,  
+      RHonBaseVolatility100, LHonBaseVolatility100, onBaseVolatility100, RHsluggingVolatility100, LHsluggingVolatility100,
+      sluggingVolatility100, RHfantasyScoreVolatility100, LHfantasyScoreVolatility100, fantasyScoreVolatility100)
 }
 
