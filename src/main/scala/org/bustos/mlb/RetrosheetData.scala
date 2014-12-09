@@ -19,8 +19,8 @@ class RetrosheetData {
   val teamsTable: TableQuery[TeamsTable] = TableQuery[TeamsTable]
   val playersTable: TableQuery[PlayersTable] = TableQuery[PlayersTable]
   
-  val db = Database.forURL("jdbc:mysql://localhost:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="root", password="")
-  //val db = Database.forURL("jdbc:mysql://mysql.bustos.org:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="mlbrsheetuser", password="mlbsheetUser")
+  //val db = Database.forURL("jdbc:mysql://localhost:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="root", password="")
+  val db = Database.forURL("jdbc:mysql://mysql.bustos.org:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="mlbrsheetuser", password="mlbsheetUser")
 
   def teams: List[String] = {
     db.withSession { implicit session =>
