@@ -82,11 +82,14 @@ object MlbServer extends App with MySslConfiguration {
             val playerStr = player.getOrElse("")   
             respondWithMediaType(`text/html`) {
               if (!teamStr.isEmpty) { 
-                complete(html.graph.render("", retrosheetData.teams, retrosheetData.players(teamStr), List(), List(), List()).toString)
+                complete(html.graph.render("", retrosheetData.teams, retrosheetData.players(teamStr), List(), List(), List(), List(), List(), List()).toString)
               } else if (!playerStr.isEmpty) {
-                complete(html.graph.render(playerStr, retrosheetData.teams, retrosheetData.players(teamStr), retrosheetData.playerBA(playerStr), retrosheetData.playerMovingBA(playerStr), retrosheetData.playerVolatilityBA(playerStr)).toString)
+                complete(html.graph.render(playerStr, retrosheetData.teams, retrosheetData.players(teamStr), 
+                    retrosheetData.playerBA(playerStr), retrosheetData.playerMovingBA(playerStr), 
+                    retrosheetData.playerVolatilityBA(playerStr), retrosheetData.playerDailyBA(playerStr), 
+                    retrosheetData.playerFantasy(playerStr), retrosheetData.playerFantasyMoving(playerStr)).toString)
               } else {
-                complete(html.graph.render("", retrosheetData.teams, List(), List(), List(), List()).toString)
+                complete(html.graph.render("", retrosheetData.teams, List(), List(), List(), List(), List(), List(), List()).toString)
               }
             }
           }
@@ -105,9 +108,8 @@ object MlbServer extends App with MySslConfiguration {
 
     val server = system.actorOf(WebSocketServer.props(), "websocket")
 
-    //IO(UHttp) ? Http.Bind(server, "localhost", 8110)
-    IO(UHttp) ? Http.Bind(server, "0.0.0.0", args(0).toInt)
-
+    if (args.length > 0) IO(UHttp) ? Http.Bind(server, "0.0.0.0", args(0).toInt)
+    else IO(UHttp) ? Http.Bind(server, "localhost", 8110)
   }
 
   // because otherwise we get an ambiguous implicit if doMain is inlined
