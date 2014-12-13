@@ -1,6 +1,8 @@
 package org.bustos.mlb
 
 import scala.slick.driver.MySQLDriver.simple._
+import spray.json._
+import DefaultJsonProtocol._ 
 
 object RetrosheetData {
   case class BattingAverageObservation(date: String, bAvg: Double, lhBAvg: Double, rhBAvg: Double)
@@ -10,6 +12,7 @@ object RetrosheetData {
 class RetrosheetData {
 
   import RetrosheetData._
+  import GoogleTableJsonProtocol._
   
   val hitterRawLH: TableQuery[HitterRawLHStatsTable] = TableQuery[HitterRawLHStatsTable]
   val hitterRawRH: TableQuery[HitterRawRHStatsTable] = TableQuery[HitterRawRHStatsTable]
@@ -22,17 +25,15 @@ class RetrosheetData {
   //val db = Database.forURL("jdbc:mysql://localhost:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="root", password="")
   val db = Database.forURL("jdbc:mysql://mysql.bustos.org:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="mlbrsheetuser", password="mlbsheetUser")
 
-  def teams: List[String] = {
+  def teams: List[(String, String, String, String)] = {
     db.withSession { implicit session =>
-      teamsTable.sortBy(_.mnemonic).list.map(p => p._1)
+      teamsTable.sortBy(_.mnemonic).list
     }
   }
   
-  def players(team: String): List[(String, String)] = {
+  def players(team: String): List[(String, String, String, String, String, String, String)] = {
     db.withSession { implicit session =>
-      //playersTable.filter(_.team === team).map(p => (p.firstName, p.lastName)).list.map({x => x._1 + " " + x._2})
-      playersTable.filter(_.team === team).list.map({x => (x._3 + " " + x._2, x._1)})
-      //playersTable.filter(_.team === team).list.map({x => x._1})
+      playersTable.filter(_.team === team).list.sortBy(_._2)
     }
   }
 
@@ -42,6 +43,16 @@ class RetrosheetData {
     } else {
       playerID.split("[")(1).replaceAll("]", "")
     }
+  }
+  
+  def cleanedAsGoogleDataTable(table: String): String = {
+    table.replaceAll("\"typeName\":", "\"type\":")
+  }
+  
+  def playerTable(data: List[BattingAverageObservation]): String = {
+    val columns = List(GoogleColumn("Date", "Date", "string"), GoogleColumn("Total", "Total", "number"), GoogleColumn("Lefties", "Against Lefties", "number"), GoogleColumn("Righties", "Against Righties", "number"))
+    val rows = data.map(ba => GoogleRow(List(new GoogleCell(ba.date), new GoogleCell(ba.bAvg), new GoogleCell(ba.lhBAvg), new GoogleCell(ba.rhBAvg))))
+    cleanedAsGoogleDataTable(GoogleTable(columns, rows).toJson.prettyPrint)
   }
   
   def playerBA(playerID: String): List[BattingAverageObservation] = {

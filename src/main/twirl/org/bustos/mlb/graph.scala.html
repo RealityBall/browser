@@ -1,8 +1,5 @@
 @import _root_.org.bustos.mlb.RetrosheetData._
-@(player: String, teams: List[String], players: List[(String,String)],
-observations: List[BattingAverageObservation],movingObservations: List[BattingAverageObservation],
-volatilityObservations: List[BattingAverageObservation], dailyObservations: List[BattingAverageObservation],
-fantasyObservations: List[BattingAverageObservation], fantasyMovingObservations: List[BattingAverageObservation])
+@(player: String)
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -25,110 +22,28 @@ fantasyObservations: List[BattingAverageObservation], fantasyMovingObservations:
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(drawChart);
+      function drawSpecificChart(player, endpoint, title, chartName) {
+		var jsonData = $.ajax({
+			url: endpoint + "?player=" + player,
+			dataType:"json",
+			async: false
+		}).responseText;
+		// Create our data table out of JSON data loaded from server.
+		var data = new google.visualization.DataTable(jsonData);
+        var options = {
+          title: title + player
+        };
+        var chart = new google.visualization.LineChart(document.getElementById(chartName));
+        chart.draw(data, options);      
+      };
       function drawChart() {
-
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
-          @if(observations.isEmpty){
-        	  [0, 0.0, 0.0, 0.0]
-          }else{
-	          @for(observation <- observations) {
-    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
-	          }
-		  	  ['@observations.last.date', @observations.last.bAvg, @observations.last.lhBAvg, @observations.last.rhBAvg]
-          }
-        ]);
-        var options = {
-          title: 'As of Date Batting Average for @player'
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('chart_ba'));
-        chart.draw(data, options);
-
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
-          @if(observations.isEmpty){
-        	  [0, 0.0, 0.0, 0.0]
-          }else{
-	          @for(observation <- movingObservations) {
-    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
-	          }
-		  	  ['@movingObservations.last.date', @movingObservations.last.bAvg, @movingObservations.last.lhBAvg, @movingObservations.last.rhBAvg]
-          }
-        ]);
-        var options = {
-          title: '25 Day Batting Averages for @player'
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('chart_ba_moving'));
-        chart.draw(data, options);
-
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
-          @if(observations.isEmpty){
-        	  [0, 0.0, 0.0, 0.0]
-          }else{
-	          @for(observation <- volatilityObservations) {
-    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
-	          }
-		  	  ['@volatilityObservations.last.date', @volatilityObservations.last.bAvg, @volatilityObservations.last.lhBAvg, @volatilityObservations.last.rhBAvg]
-          }
-        ]);
-        var options = {
-          title: '100 Day Batting Average Volatility for @player'
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('chart_ba_volatility'));
-        chart.draw(data, options);
-
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
-          @if(observations.isEmpty){
-        	  [0, 0.0, 0.0, 0.0]
-          }else{
-	          @for(observation <- dailyObservations) {
-    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
-	          }
-		  	  ['@dailyObservations.last.date', @dailyObservations.last.bAvg, @dailyObservations.last.lhBAvg, @dailyObservations.last.rhBAvg]
-          }
-        ]);
-        var options = {
-          title: 'Daily Batting Average for @player'
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('chart_ba_daily'));
-        chart.draw(data, options);
-
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
-          @if(observations.isEmpty){
-        	  [0, 0.0, 0.0, 0.0]
-          }else{
-	          @for(observation <- fantasyObservations) {
-    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
-	          }
-		  	  ['@fantasyObservations.last.date', @fantasyObservations.last.bAvg, @fantasyObservations.last.lhBAvg, @fantasyObservations.last.rhBAvg]
-          }
-        ]);
-        var options = {
-          title: 'Daily fantasy score for @player'
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('chart_fantasy'));
-        chart.draw(data, options);
-
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Total', 'Against Lefties', 'Against Righties'],
-          @if(observations.isEmpty){
-        	  [0, 0.0, 0.0, 0.0]
-          }else{
-	          @for(observation <- fantasyMovingObservations) {
-    	    	  ['@observation.date', @observation.bAvg, @observation.lhBAvg, @observation.rhBAvg],
-	          }
-		  	  ['@fantasyMovingObservations.last.date', @fantasyMovingObservations.last.bAvg, @fantasyMovingObservations.last.lhBAvg, @fantasyMovingObservations.last.rhBAvg]
-          }
-        ]);
-        var options = {
-          title: 'Moving average fantasy score for @player'
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('chart_fantasy_moving'));
-        chart.draw(data, options);
-    }
+        drawSpecificChart('@player', "/playerBA", "As of Date Batting Average for ", 'chart_ba');
+        drawSpecificChart('@player', "/playerMovingBA", "25 Day Batting Averages for ", 'chart_ba_moving');
+        drawSpecificChart('@player', "/playerVolatilityBA", "100 Day Batting Average Volatility for ", 'chart_ba_volatility');
+        drawSpecificChart('@player', "/playerDailyBA", "Daily Batting Average Volatility for ", 'chart_ba_daily');
+        drawSpecificChart('@player', "/playerFantasy", "Daily fantasy score for ", 'chart_fantasy');
+        drawSpecificChart('@player', "/playerFantasyMoving", "Moving average fantasy score for ", 'chart_fantasy_moving');
+      };
     </script>
   </head>
   <body>
@@ -139,14 +54,11 @@ fantasyObservations: List[BattingAverageObservation], fantasyMovingObservations:
 	   <div>
 	      <ul class="nav navbar-nav">
 	         <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="selectedTeam">
 	               Teams 
 	               <b class="caret"></b>
 	            </a>
-	            <ul class="dropdown-menu">
-	               @for(team<-teams) {
-	               	<li><a href="graph?team=@team">@team</a>
-	               }
+	            <ul class="dropdown-menu" id="teamList">
 	            </ul>
 	         </li>
 	         <li class="dropdown">
@@ -154,10 +66,7 @@ fantasyObservations: List[BattingAverageObservation], fantasyMovingObservations:
 	               Players 
 	               <b class="caret"></b>
 	            </a>
-	            <ul class="dropdown-menu">
-	               @for(player<-players) {
-	               	<li><a href="graph?player=@player._2">@player._1</a>
-	               }
+	            <ul class="dropdown-menu" id="playerList">
 	            </ul>
 	         </li>
 	      </ul>
@@ -176,8 +85,9 @@ fantasyObservations: List[BattingAverageObservation], fantasyMovingObservations:
 	   <div class="col-md-6" id="chart_fantasy_moving" style="width: 900px; height: 500px;"></div>
 	</div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./graph.js"></script>
   </body>
 </html>

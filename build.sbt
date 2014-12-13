@@ -27,8 +27,10 @@ libraryDependencies ++= {
     "com.typesafe.slick"  %%  "slick" % "2.1.0",
     "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test",
     "com.wandoulabs.akka" %% "spray-websocket" % "0.1.3",
-    "org.slf4j"           %  "slf4j-nop" % "1.6.4",
-    "mysql" % "mysql-connector-java" % "latest.release"
+    "log4j"               %   "log4j"         % "1.2.14",
+    "org.slf4j"           %   "slf4j-api"     % "1.7.6",
+    "org.slf4j"           %   "slf4j-simple"  % "1.7.6",
+    "mysql"               % "mysql-connector-java" % "latest.release"
   )
 }
 
