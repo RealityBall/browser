@@ -1,8 +1,7 @@
 package org.bustos.mlb
 
 import scala.slick.driver.MySQLDriver.simple._
-import spray.json._
-import DefaultJsonProtocol._ 
+import scala.util.Properties.envOrNone
 
 object RetrosheetData {
   case class BattingAverageObservation(date: String, bAvg: Double, lhBAvg: Double, rhBAvg: Double)
@@ -23,7 +22,11 @@ class RetrosheetData {
   val playersTable: TableQuery[PlayersTable] = TableQuery[PlayersTable]
   
   //val db = Database.forURL("jdbc:mysql://localhost:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="root", password="")
-  val db = Database.forURL("jdbc:mysql://mysql.bustos.org:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="mlbrsheetuser", password="mlbsheetUser")
+  val mysqlURL = envOrNone("MLB_MYSQL_URL").get
+  val mysqlUser = envOrNone("MLB_MYSQL_USER").get
+  val mysqlPassword = envOrNone("MLB_MYSQL_PASSWORD").get
+
+  val db = Database.forURL(mysqlURL, driver="com.mysql.jdbc.Driver", user=mysqlUser, password=mysqlPassword)
 
   def teams: List[(String, String, String, String)] = {
     db.withSession { implicit session =>
@@ -45,14 +48,10 @@ class RetrosheetData {
     }
   }
   
-  def cleanedAsGoogleDataTable(table: String): String = {
-    table.replaceAll("\"typeName\":", "\"type\":")
-  }
-  
   def playerTable(data: List[BattingAverageObservation]): String = {
-    val columns = List(GoogleColumn("Date", "Date", "string"), GoogleColumn("Total", "Total", "number"), GoogleColumn("Lefties", "Against Lefties", "number"), GoogleColumn("Righties", "Against Righties", "number"))
+    val columns = List(new GoogleColumn("Date", "Date", "string"), new GoogleColumn("Total", "Total", "number"), new GoogleColumn("Lefties", "Against Lefties", "number"), new GoogleColumn("Righties", "Against Righties", "number"))
     val rows = data.map(ba => GoogleRow(List(new GoogleCell(ba.date), new GoogleCell(ba.bAvg), new GoogleCell(ba.lhBAvg), new GoogleCell(ba.rhBAvg))))
-    cleanedAsGoogleDataTable(GoogleTable(columns, rows).toJson.prettyPrint)
+    GoogleTable(columns, rows).toJson.prettyPrint
   }
   
   def playerBA(playerID: String): List[BattingAverageObservation] = {
