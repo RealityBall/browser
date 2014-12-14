@@ -24,25 +24,29 @@ $(document).ready(function(){
 		});
 	};
 	function drawSpecificChart(player, endpoint, title, chartName) {
-		var jsonData = $.ajax({
+		$.ajax({
 		  url: endpoint + "?player=" + player,
 		  dataType:"json",
-		  async: false
-		}).responseText;
-		// Create our data table out of JSON data loaded from server.
-		var data = new google.visualization.DataTable(jsonData);
-		var options = {
-			title: title
-		};
-		var chart = new google.visualization.LineChart(document.getElementById(chartName));
-		chart.draw(data, options);      
+		  success: function (data, textStatus, xhr) {
+			   // Create our data table out of JSON data loaded from server.
+			   var dataTable = new google.visualization.DataTable(data);
+			   var options = {
+				   title: title
+			   };
+			   var chart = new google.visualization.LineChart(document.getElementById(chartName));
+			   chart.draw(dataTable, options);      
+		  },
+		  error: function (xhr, textStatus, errorThrown) {
+			  console.log('a' + textStatus);
+		  }
+		});
 	};
 	function handlePlayerSelect() {
 		$("#selectedPlayer").text(this.innerText);
 		drawSpecificChart(this.id, "/playerBA", "As of Date Batting Average", 'chart_ba');
 		drawSpecificChart(this.id, "/playerMovingBA", "25 Day Batting Averages", 'chart_ba_moving');
 		drawSpecificChart(this.id, "/playerVolatilityBA", "100 Day Batting Average Volatility", 'chart_ba_volatility');
-		drawSpecificChart(this.id, "/playerDailyBA", "Daily Batting Average Volatility", 'chart_ba_daily');
+		drawSpecificChart(this.id, "/playerDailyBA", "Daily Batting Average", 'chart_ba_daily');
 		drawSpecificChart(this.id, "/playerFantasy", "Daily fantasy score", 'chart_fantasy');
 		drawSpecificChart(this.id, "/playerFantasyMoving", "Moving average fantasy score", 'chart_fantasy_moving');
 		drawSpecificChart(this.id, "/playerSlugging", "Slugging percentage", 'chart_slg');
