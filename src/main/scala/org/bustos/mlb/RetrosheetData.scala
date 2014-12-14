@@ -48,7 +48,7 @@ class RetrosheetData {
     }
   }
   
-  def playerTable(data: List[BattingAverageObservation]): String = {
+  def dataTable(data: List[BattingAverageObservation]): String = {
     val columns = List(new GoogleColumn("Date", "Date", "string"), new GoogleColumn("Total", "Total", "number"), new GoogleColumn("Lefties", "Against Lefties", "number"), new GoogleColumn("Righties", "Against Righties", "number"))
     val rows = data.map(ba => GoogleRow(List(new GoogleCell(ba.date), new GoogleCell(ba.bAvg), new GoogleCell(ba.lhBAvg), new GoogleCell(ba.rhBAvg))))
     GoogleTable(columns, rows).toJson.prettyPrint
@@ -95,5 +95,46 @@ class RetrosheetData {
       playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
     }
   }
+
+  def playerSlugging(playerID: String): List[BattingAverageObservation] = {        
+    db.withSession { implicit session =>
+      val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingPercentage, p.LHsluggingPercentage, p.RHsluggingPercentage)).list
+      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+    }
+  }
   
+  def playerOnBase(playerID: String): List[BattingAverageObservation] = {        
+    db.withSession { implicit session =>
+      val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBasePercentage, p.LHonBasePercentage, p.RHonBasePercentage)).list
+      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+    }
+  }
+  
+  def playerSluggingMoving(playerID: String): List[BattingAverageObservation] = {        
+    db.withSession { implicit session =>
+      val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingPercentage25, p.LHsluggingPercentage25, p.RHsluggingPercentage25)).list
+      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+    }
+  }
+  
+  def playerOnBaseMoving(playerID: String): List[BattingAverageObservation] = {        
+    db.withSession { implicit session =>
+      val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBasePercentage25, p.LHonBasePercentage25, p.RHonBasePercentage25)).list
+      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+    }
+  }
+  
+  def playerSluggingVolatility(playerID: String): List[BattingAverageObservation] = {        
+    db.withSession { implicit session =>
+      val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingVolatility100, p.LHsluggingVolatility100, p.RHsluggingVolatility100)).list
+      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+    }
+  }
+  
+  def playerOnBaseVolatility(playerID: String): List[BattingAverageObservation] = {        
+    db.withSession { implicit session =>
+      val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBaseVolatility100, p.LHonBaseVolatility100, p.RHonBaseVolatility100)).list
+      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+    }
+  }
 }

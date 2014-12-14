@@ -20,31 +20,8 @@
 	</head>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
-      google.load("visualization", "1", {packages:["corechart"]});
-      google.setOnLoadCallback(drawChart);
-      function drawSpecificChart(player, endpoint, title, chartName) {
-		var jsonData = $.ajax({
-			url: endpoint + "?player=" + player,
-			dataType:"json",
-			async: false
-		}).responseText;
-		// Create our data table out of JSON data loaded from server.
-		var data = new google.visualization.DataTable(jsonData);
-        var options = {
-          title: title + player
-        };
-        var chart = new google.visualization.LineChart(document.getElementById(chartName));
-        chart.draw(data, options);      
-      };
-      function drawChart() {
-        drawSpecificChart('@player', "/playerBA", "As of Date Batting Average for ", 'chart_ba');
-        drawSpecificChart('@player', "/playerMovingBA", "25 Day Batting Averages for ", 'chart_ba_moving');
-        drawSpecificChart('@player', "/playerVolatilityBA", "100 Day Batting Average Volatility for ", 'chart_ba_volatility');
-        drawSpecificChart('@player', "/playerDailyBA", "Daily Batting Average Volatility for ", 'chart_ba_daily');
-        drawSpecificChart('@player', "/playerFantasy", "Daily fantasy score for ", 'chart_fantasy');
-        drawSpecificChart('@player', "/playerFantasyMoving", "Moving average fantasy score for ", 'chart_fantasy_moving');
-      };
-    </script>
+        google.load("visualization", "1", {packages:["corechart"]});
+	</script>
   </head>
   <body>
 	  <nav class="navbar navbar-default" role="navigation">
@@ -62,7 +39,7 @@
 	            </ul>
 	         </li>
 	         <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="selectedPlayer">
 	               Players 
 	               <b class="caret"></b>
 	            </a>
@@ -83,6 +60,18 @@
 	<div class="row">   
 	   <div class="col-md-6" id="chart_fantasy" style="width: 900px; height: 500px;"></div>
 	   <div class="col-md-6" id="chart_fantasy_moving" style="width: 900px; height: 500px;"></div>
+	</div>
+	<div class="row">   
+	   <div class="col-md-6" id="chart_slg" style="width: 900px; height: 500px;"></div>
+	   <div class="col-md-6" id="chart_obp" style="width: 900px; height: 500px;"></div>
+	</div>
+	<div class="row">   
+	   <div class="col-md-6" id="chart_slg_moving" style="width: 900px; height: 500px;"></div>
+	   <div class="col-md-6" id="chart_obp_moving" style="width: 900px; height: 500px;"></div>
+	</div>
+	<div class="row">   
+	   <div class="col-md-6" id="chart_slg_volatility" style="width: 900px; height: 500px;"></div>
+	   <div class="col-md-6" id="chart_obp_volatility" style="width: 900px; height: 500px;"></div>
 	</div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>

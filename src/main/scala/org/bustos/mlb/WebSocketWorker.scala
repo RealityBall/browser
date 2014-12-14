@@ -74,42 +74,84 @@ class WebSocketWorker(val serverConnection: ActorRef) extends HttpServiceActor w
       path("playerBA") {
         parameters('player) { (player) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.playerTable(retrosheetData.playerBA(player)))
+            complete(retrosheetData.dataTable(retrosheetData.playerBA(player)))
           }
         }        
       } ~
       path("playerMovingBA") {
         parameters('player) { (player) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.playerTable(retrosheetData.playerMovingBA(player)))
+            complete(retrosheetData.dataTable(retrosheetData.playerMovingBA(player)))
           }
         }        
       } ~
       path("playerVolatilityBA") {
         parameters('player) { (player) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.playerTable(retrosheetData.playerVolatilityBA(player)))
+            complete(retrosheetData.dataTable(retrosheetData.playerVolatilityBA(player)))
           }
         }        
       } ~
       path("playerDailyBA") {
         parameters('player) { (player) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.playerTable(retrosheetData.playerDailyBA(player)))
+            complete(retrosheetData.dataTable(retrosheetData.playerDailyBA(player)))
           }
         }        
       } ~
       path("playerFantasy") {
         parameters('player) { (player) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.playerTable(retrosheetData.playerFantasy(player)))
+            complete(retrosheetData.dataTable(retrosheetData.playerFantasy(player)))
           }
         }        
       } ~
       path("playerFantasyMoving") {
         parameters('player) { (player) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.playerTable(retrosheetData.playerFantasyMoving(player)))
+            complete(retrosheetData.dataTable(retrosheetData.playerFantasyMoving(player)))
+          }
+        }        
+      } ~
+      path("playerSlugging") {
+        parameters('player) { (player) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataTable(retrosheetData.playerSlugging(player)))
+          }
+        }        
+      } ~
+      path("playerOnBase") {
+        parameters('player) { (player) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataTable(retrosheetData.playerOnBase(player)))
+          }
+        }        
+      } ~
+      path("playerSluggingMoving") {
+        parameters('player) { (player) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataTable(retrosheetData.playerSluggingMoving(player)))
+          }
+        }        
+      } ~
+      path("playerOnBaseMoving") {
+        parameters('player) { (player) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataTable(retrosheetData.playerOnBaseMoving(player)))
+          }
+        }        
+      } ~
+      path("playerSluggingVolatility") {
+        parameters('player) { (player) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataTable(retrosheetData.playerSluggingVolatility(player)))
+          }
+        }        
+      } ~
+      path("playerOnBaseVolatility") {
+        parameters('player) { (player) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataTable(retrosheetData.playerOnBaseVolatility(player)))
           }
         }        
       } ~
