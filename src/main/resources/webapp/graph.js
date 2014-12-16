@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	var loadingGraphs = 0;
   	$.ajax({
 		url: "/teams",
 		cache: false
@@ -10,13 +11,15 @@ $(document).ready(function(){
 		$("ul#teamList li").on('click', handleTeamSelect);
 	});
 	function handleTeamSelect() {
-		$("#selectedTeam").text(this.innerText);
-		$("#selectedPlayer").text('Players');
+		$("#selectedTeamText").text(this.innerText);
+		$("#selectedPlayerText").text('Players');
+		$("#playerSelectStatus").addClass('hide');
+		loadingGraphs = 0;
 		$.ajax({
 			url: "/players?team=" + this.id,
 			cache: false
 		}).done (function (players) {
-			$("#playerList").empty();
+			$("ul#playerList").empty();
 			$.each(players, function(key, val) {
 				$("#playerList").append("<li id=\"" + val[0] + "\"><a href=\"#\">" + val[2] + " " + val[1] + " (" + val[6] + ")</a></li>");
 			});
@@ -24,6 +27,8 @@ $(document).ready(function(){
 		});
 	};
 	function drawSpecificChart(player, endpoint, title, chartName) {
+		loadingGraphs++;
+		if (loadingGraphs == 1) $("#playerSelectStatus").removeClass('hide');		
 		$.ajax({
 		  url: endpoint + "?player=" + player,
 		  dataType:"json",
@@ -35,6 +40,8 @@ $(document).ready(function(){
 			   };
 			   var chart = new google.visualization.LineChart(document.getElementById(chartName));
 			   chart.draw(dataTable, options);      
+			   loadingGraphs--;
+			   if (loadingGraphs <= 0) $("#playerSelectStatus").addClass('hide');		
 		  },
 		  error: function (xhr, textStatus, errorThrown) {
 			  console.log('a' + textStatus);
@@ -42,7 +49,7 @@ $(document).ready(function(){
 		});
 	};
 	function handlePlayerSelect() {
-		$("#selectedPlayer").text(this.innerText);
+		$("#selectedPlayerText").text(this.innerText);
 		drawSpecificChart(this.id, "/playerBA", "As of Date Batting Average", 'chart_ba');
 		drawSpecificChart(this.id, "/playerMovingBA", "25 Day Batting Averages", 'chart_ba_moving');
 		drawSpecificChart(this.id, "/playerVolatilityBA", "100 Day Batting Average Volatility", 'chart_ba_volatility');

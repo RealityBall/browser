@@ -40,11 +40,9 @@ class WebSocketWorker(val serverConnection: ActorRef) extends HttpServiceActor w
   def businessLogic: Receive = {
     // just bounce frames back for Autobahn testsuite
     case x @ (_: BinaryFrame | _: TextFrame) =>
-      println("Frame: " + x)
       sender() ! x
 
     case Push(msg) =>
-      println("Push: " + msg)
       send(TextFrame(msg))
 
     case x: FrameCommandFailed =>
