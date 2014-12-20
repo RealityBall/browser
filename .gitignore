@@ -4,7 +4,10 @@
 # sbt specific
 .cache
 .history
+.project
+.classpath
 .lib/
+.settings/
 dist/*
 target/
 lib_managed/
