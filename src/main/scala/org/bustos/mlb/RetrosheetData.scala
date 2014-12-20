@@ -36,7 +36,8 @@ class RetrosheetData {
   
   def players(team: String): List[(String, String, String, String, String, String, String)] = {
     db.withSession { implicit session =>
-      playersTable.filter(_.team === team).list.sortBy(_._2)
+      val partitions = playersTable.filter(_.team === team).list.partition(_._7 != "P")
+      partitions._1.sortBy(_._2) ++ partitions._2.sortBy(_._2)
     }
   }
 

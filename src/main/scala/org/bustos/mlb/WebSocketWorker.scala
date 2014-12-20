@@ -24,7 +24,7 @@ object WebSocketWorker {
   def props(serverConnection: ActorRef) = Props(classOf[WebSocketWorker], serverConnection)
 }
   
-class WebSocketWorker(val serverConnection: ActorRef) extends HttpServiceActor with WebSocketServerWorker with MLBRoutes{
+class WebSocketWorker(val serverConnection: ActorRef) extends HttpServiceActor with WebSocketServerWorker with MLBRoutes {
   
   import WebSocketWorker._
   

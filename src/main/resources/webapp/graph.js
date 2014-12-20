@@ -20,7 +20,12 @@ $(document).ready(function(){
 			cache: false
 		}).done (function (players) {
 			$("ul#playerList").empty();
+			var pitcherStarted = false;
 			$.each(players, function(key, val) {
+				if (val[6] == "P" && !pitcherStarted) {
+					pitcherStarted = true;
+					$("#playerList").append("<li role=\"presentation\" class=\"divider\"></li>");
+				}
 				$("#playerList").append("<li id=\"" + val[0] + "\"><a href=\"#\">" + val[2] + " " + val[1] + " (" + val[6] + ")</a></li>");
 			});
 			$("ul#playerList li").on('click', handlePlayerSelect);
