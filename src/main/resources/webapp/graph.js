@@ -21,12 +21,12 @@ $(document).ready(function(){
 		}).done (function (players) {
 			$("ul#playerList").empty();
 			var pitcherStarted = false;
-			$.each(players, function(key, val) {
-				if (val[6] == "P" && !pitcherStarted) {
+			$.each(players, function(key, player) {
+				if (player.position == "P" && !pitcherStarted) {
 					pitcherStarted = true;
 					$("#playerList").append("<li role=\"presentation\" class=\"divider\"></li>");
 				}
-				$("#playerList").append("<li id=\"" + val[0] + "\"><a href=\"#\">" + val[2] + " " + val[1] + " (" + val[6] + ")</a></li>");
+				$("#playerList").append("<li id=\"" + player.id + "\"><a href=\"#\">" + player.firstName + " " + player.lastName + " (" + player.position + ")</a></li>");
 			});
 			$("ul#playerList li").on('click', handlePlayerSelect);
 		});
@@ -35,21 +35,33 @@ $(document).ready(function(){
 		loadingGraphs++;
 		if (loadingGraphs == 1) $("#playerSelectStatus").removeClass('hide');		
 		$.ajax({
-		  url: endpoint + "?player=" + player,
-		  dataType:"json",
+		  url: "/playerSummary?player=" + player,
+		  dataType: "json",
+		  cache: false,
 		  success: function (data, textStatus, xhr) {
-			   // Create our data table out of JSON data loaded from server.
-			   var dataTable = new google.visualization.DataTable(data);
-			   var options = {
-				   title: title
-			   };
-			   var chart = new google.visualization.LineChart(document.getElementById(chartName));
-			   chart.draw(dataTable, options);      
-			   loadingGraphs--;
-			   if (loadingGraphs <= 0) $("#playerSelectStatus").addClass('hide');		
+		  	$("#playerSummary").html("<b>Bats:</b> " + data.meta.batsWith + ", <b>Throws:</b> " + data.meta.throwsWith + ", <b>RH At Bats:</b> " + 
+		  								data.appearances.RHatBats + ", <b>LH At Bats:</b> " + data.appearances.LHatBats + ", <b>Games:</b> " + data.appearances.games);
 		  },
 		  error: function (xhr, textStatus, errorThrown) {
-			  console.log('a' + textStatus);
+		  	console.log(textStatus);	
+		  }
+		});
+		$.ajax({
+		  url: endpoint + "?player=" + player,
+		  dataType: "json",
+		  success: function (data, textStatus, xhr) {
+			// Create our data table out of JSON data loaded from server.
+			var dataTable = new google.visualization.DataTable(data);
+			var options = {
+				title: title
+			};
+			var chart = new google.visualization.LineChart(document.getElementById(chartName));
+			chart.draw(dataTable, options);      
+			loadingGraphs--;
+			if (loadingGraphs <= 0) $("#playerSelectStatus").addClass('hide');		
+		  },
+		  error: function (xhr, textStatus, errorThrown) {
+			console.log(textStatus);
 		  }
 		});
 	};

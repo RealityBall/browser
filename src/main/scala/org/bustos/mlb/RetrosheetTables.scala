@@ -2,6 +2,7 @@ package org.bustos.mlb
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.lifted.{ProvenShape, ForeignKeyQuery}
+import RetrosheetData._
 
 class TeamsTable(tag: Tag)
   extends Table[(String, String, String, String)](tag, "teams") {
@@ -16,7 +17,7 @@ class TeamsTable(tag: Tag)
 }
 
 class PlayersTable(tag: Tag)
-  extends Table[(String, String, String, String, String, String, String)](tag, "players") {
+  extends Table[Player](tag, "players") {
 
   def mnemonic: Column[String] = column[String]("mnemonic")
   def lastName: Column[String] = column[String]("lastName")
@@ -27,7 +28,8 @@ class PlayersTable(tag: Tag)
   def position: Column[String] = column[String]("position")
 
   // Every table needs a * projection with the same type as the table's type parameter
-  def * : ProvenShape[(String, String, String, String, String, String, String)] = (mnemonic, lastName, firstName, batsWith, throwsWith, team, position)
+  //def * : ProvenShape[(String, String, String, String, String, String, String)] = (mnemonic, lastName, firstName, batsWith, throwsWith, team, position)
+  def * = (mnemonic, lastName, firstName, batsWith, throwsWith, team, position) <> (Player.tupled, Player.unapply)
 }
 
 class HitterRawLHStatsTable(tag: Tag)

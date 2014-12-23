@@ -2,10 +2,22 @@ package org.bustos.mlb
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.util.Properties.envOrNone
+import spray.json._
+import DefaultJsonProtocol._ 
+import scala.slick.jdbc.{GetResult, StaticQuery => Q}
 
 object RetrosheetData {
   case class BattingAverageObservation(date: String, bAvg: Double, lhBAvg: Double, rhBAvg: Double)
   case class Player(id: String, lastName: String, firstName: String, batsWith: String, throwsWith: String, team: String, position: String)
+  case class PlayerSummary(id: String, RHatBats: Int, LHatBats: Int, games: Int)
+  case class PlayerData(meta: Player, appearances: PlayerSummary)
+}
+
+object RetrosheetJsonProtocol extends DefaultJsonProtocol {
+  import RetrosheetData._
+  implicit val playerFormat = jsonFormat7(Player)
+  implicit val playerSummaryFormat = jsonFormat4(PlayerSummary)
+  implicit val playerDataFormat = jsonFormat2(PlayerData)
 }
 
 class RetrosheetData {
@@ -34,13 +46,28 @@ class RetrosheetData {
     }
   }
   
-  def players(team: String): List[(String, String, String, String, String, String, String)] = {
+  def players(team: String): List[Player] = {
     db.withSession { implicit session =>
-      val partitions = playersTable.filter(_.team === team).list.partition(_._7 != "P")
-      partitions._1.sortBy(_._2) ++ partitions._2.sortBy(_._2)
+      val partitions = playersTable.filter(_.team === team).list.partition(_.position != "P")
+      partitions._1.sortBy(_.lastName) ++ partitions._2.sortBy(_.lastName)
     }
   }
 
+  def playerSummary(playerID: String): PlayerData = {
+    db.withSession { implicit session =>
+      val playerMnemonic = truePlayerID(playerID)
+      val player = playersTable.filter(_.mnemonic === playerMnemonic).list.head
+      val RHatBats = hitterRawRH.filter(_.playerID === playerMnemonic).map(_.RHatBat).sum.run.get
+      val LHatBats = hitterRawLH.filter(_.playerID === playerMnemonic).map(_.LHatBat).sum.run.get
+      val gamesQuery = for {
+                         r <- hitterRawLH if r.playerID === playerMnemonic;
+                         l <- hitterRawRH if (l.playerID === playerMnemonic && l.date === r.date)
+                       } yield (1)
+      val summary = PlayerSummary(playerMnemonic, RHatBats, LHatBats, gamesQuery.length.run)
+      PlayerData(player, summary)
+    }
+  }
+  
   def truePlayerID(playerID: String): String = {
     if (!playerID.contains("[")) {
       playerID      

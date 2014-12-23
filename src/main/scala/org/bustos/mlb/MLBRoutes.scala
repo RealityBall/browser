@@ -11,6 +11,8 @@ import org.slf4j.{Logger, LoggerFactory}
 
 trait MLBRoutes extends HttpService {
   
+  import RetrosheetJsonProtocol._
+  
   val retrosheetData = new RetrosheetData
   val logger = LoggerFactory.getLogger(getClass)
 
@@ -26,6 +28,13 @@ trait MLBRoutes extends HttpService {
       parameters('team) { (team) => 
         respondWithMediaType(`application/json`) {
           complete(retrosheetData.players(team).toJson.toString)
+        }
+      }
+    } ~
+    path("playerSummary") {
+      parameters('player) { (player) => 
+        respondWithMediaType(`application/json`) {
+          complete(retrosheetData.playerSummary(player).toJson.toString)
         }
       }
     } ~
