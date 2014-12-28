@@ -18,11 +18,15 @@ trait MLBRoutes extends HttpService {
 
   val mlbRoutes = {
     getFromResourceDirectory("webapp") ~
+    path("years") {
+      respondWithMediaType(`application/json`) {
+        complete(retrosheetData.years.toJson.toString)
+      }
+    } ~
     path("teams") {
       respondWithMediaType(`application/json`) {
         complete(retrosheetData.teams.toJson.toString)
       }
-      
     } ~
     path("players") {
       parameters('team) { (team) => 

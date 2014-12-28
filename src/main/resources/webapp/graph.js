@@ -14,6 +14,7 @@ $(document).ready(function(){
 		$("#selectedTeamText").text(this.innerText);
 		$("#selectedPlayerText").text('Players');
 		$("#playerSelectStatus").addClass('hide');
+		$("#playerSummary").html('');
 		loadingGraphs = 0;
 		$.ajax({
 			url: "/players?team=" + this.id,

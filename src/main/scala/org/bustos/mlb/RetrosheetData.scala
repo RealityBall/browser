@@ -6,23 +6,9 @@ import spray.json._
 import DefaultJsonProtocol._ 
 import scala.slick.jdbc.{GetResult, StaticQuery => Q}
 
-object RetrosheetData {
-  case class BattingAverageObservation(date: String, bAvg: Double, lhBAvg: Double, rhBAvg: Double)
-  case class Player(id: String, lastName: String, firstName: String, batsWith: String, throwsWith: String, team: String, position: String)
-  case class PlayerSummary(id: String, RHatBats: Int, LHatBats: Int, games: Int)
-  case class PlayerData(meta: Player, appearances: PlayerSummary)
-}
-
-object RetrosheetJsonProtocol extends DefaultJsonProtocol {
-  import RetrosheetData._
-  implicit val playerFormat = jsonFormat7(Player)
-  implicit val playerSummaryFormat = jsonFormat4(PlayerSummary)
-  implicit val playerDataFormat = jsonFormat2(PlayerData)
-}
-
 class RetrosheetData {
 
-  import RetrosheetData._
+  import RetrosheetRecords._
   import GoogleTableJsonProtocol._
   
   val hitterRawLH: TableQuery[HitterRawLHStatsTable] = TableQuery[HitterRawLHStatsTable]
@@ -34,6 +20,7 @@ class RetrosheetData {
   val playersTable: TableQuery[PlayersTable] = TableQuery[PlayersTable]
   
   //val db = Database.forURL("jdbc:mysql://localhost:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="root", password="")
+  
   val mysqlURL = envOrNone("MLB_MYSQL_URL").get
   val mysqlUser = envOrNone("MLB_MYSQL_USER").get
   val mysqlPassword = envOrNone("MLB_MYSQL_PASSWORD").get
@@ -82,87 +69,100 @@ class RetrosheetData {
     GoogleTable(columns, rows).toJson.prettyPrint
   }
   
+  def displayDouble(x: Option[Double]): Double = {
+    x match {
+      case None => Double.NaN
+      case _ => x.get
+    }
+  }
+  
+  def years: List[String] = {
+    db.withSession { implicit session =>
+      Q.queryNA[String]("select distinct(substring(date, 1, 4)) from games").list
+    }
+  }
+  
   def playerBA(playerID: String): List[BattingAverageObservation] = {
     db.withSession { implicit session =>
       val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.battingAverage, p.LHbattingAverage, p.RHbattingAverage)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerMovingBA(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.battingAverage25, p.LHbattingAverage25, p.RHbattingAverage25)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerVolatilityBA(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.battingVolatility100, p.LHbattingVolatility100, p.RHbattingVolatility100)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerDailyBA(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.dailyBattingAverage, p.LHdailyBattingAverage, p.RHdailyBattingAverage)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerFantasy(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.fantasyScore, p.LHfantasyScore, p.RHfantasyScore)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerFantasyMoving(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.fantasyScore25, p.LHfantasyScore25, p.RHfantasyScore25)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
 
   def playerSlugging(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingPercentage, p.LHsluggingPercentage, p.RHsluggingPercentage)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerOnBase(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBasePercentage, p.LHonBasePercentage, p.RHonBasePercentage)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerSluggingMoving(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingPercentage25, p.LHsluggingPercentage25, p.RHsluggingPercentage25)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerOnBaseMoving(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBasePercentage25, p.LHonBasePercentage25, p.RHonBasePercentage25)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerSluggingVolatility(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingVolatility100, p.LHsluggingVolatility100, p.RHsluggingVolatility100)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
   def playerOnBaseVolatility(playerID: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
       val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBaseVolatility100, p.LHonBaseVolatility100, p.RHonBaseVolatility100)).list
-      playerStats.map({x => BattingAverageObservation(x._1, x._2, x._3, x._4)})
+      playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
 }
