@@ -10,10 +10,12 @@ object RetrosheetRecords {
 
   case class Statistic(var total: Double, var rh: Double, var lh: Double)
   case class StatisticInputs(var totalNumer: Int, var totalDenom: Int, var rhNumer: Int, var rhDenom: Int, var lhNumer: Int, var lhDenom: Int)
-  case class Team(mnemonic: String, league: String, city: String, name: String)
+  case class RunningData(ba: Queue[StatisticInputs], obp: Queue[StatisticInputs], slugging: Queue[StatisticInputs], fantasy: Queue[Statistic])
+  case class RunningVolatilityData(ba: Queue[StatisticInputs], obp: Queue[StatisticInputs], slugging: Queue[StatisticInputs], fantasy: Queue[Statistic])
+  case class Team(year: String, mnemonic: String, league: String, city: String, name: String)
 
   case class BattingAverageObservation(date: String, bAvg: Double, lhBAvg: Double, rhBAvg: Double)
-  case class Player(id: String, lastName: String, firstName: String, batsWith: String, throwsWith: String, team: String, position: String)
+  case class Player(id: String, year: String, lastName: String, firstName: String, batsWith: String, throwsWith: String, team: String, position: String)
   case class PlayerSummary(id: String, RHatBats: Int, LHatBats: Int, games: Int)
   case class PlayerData(meta: Player, appearances: PlayerSummary)
   case class Game(var id: String, var homeTeam: String, var visitingTeam: String, var site: String, var date: String, var number: Int)
@@ -26,20 +28,21 @@ object RetrosheetRecords {
 import RetrosheetRecords._
 object RetrosheetJsonProtocol extends DefaultJsonProtocol {
   import RetrosheetRecords._
-  implicit val playerFormat = jsonFormat7(Player)
+  implicit val playerFormat = jsonFormat8(Player)
   implicit val playerSummaryFormat = jsonFormat4(PlayerSummary)
   implicit val playerDataFormat = jsonFormat2(PlayerData)
 }
 
 class TeamsTable(tag: Tag)
-  extends Table[(String, String, String, String)](tag, "teams") {
+  extends Table[(String, String, String, String, String)](tag, "teams") {
 
+  def year: Column[String] = column[String]("year")
   def mnemonic: Column[String] = column[String]("mnemonic")
   def league: Column[String] = column[String]("league")
   def city: Column[String] = column[String]("city")
   def name: Column[String] = column[String]("name")
 
-  def * : ProvenShape[(String, String, String, String)] = (mnemonic, league, city, name)
+  def * : ProvenShape[(String, String, String, String, String)] = (year, mnemonic, league, city, name)
 }
 
 class GamesTable(tag: Tag)
@@ -94,6 +97,7 @@ class PlayersTable(tag: Tag)
   extends Table[Player](tag, "players") {
 
   def mnemonic: Column[String] = column[String]("mnemonic")
+  def year: Column[String] = column[String]("year")
   def lastName: Column[String] = column[String]("lastName")
   def firstName: Column[String] = column[String]("firstName")
   def batsWith: Column[String] = column[String]("batsWith")
@@ -101,7 +105,7 @@ class PlayersTable(tag: Tag)
   def team: Column[String] = column[String]("team")
   def position: Column[String] = column[String]("position")
 
-  def * = (mnemonic, lastName, firstName, batsWith, throwsWith, team, position) <> (Player.tupled, Player.unapply)
+  def * = (mnemonic, year, lastName, firstName, batsWith, throwsWith, team, position) <> (Player.tupled, Player.unapply)
 }
 
 class HitterRawLHStatsTable(tag: Tag)

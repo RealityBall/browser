@@ -27,31 +27,54 @@ class RetrosheetData {
 
   val db = Database.forURL(mysqlURL, driver="com.mysql.jdbc.Driver", user=mysqlUser, password=mysqlPassword)
 
-  def teams: List[(String, String, String, String)] = {
+  def teams(year: String): List[(String, String, String, String, String)] = {
     db.withSession { implicit session =>
-      teamsTable.sortBy(_.mnemonic).list
+      if (year == "All") {
+        Q.queryNA[(String, String, String, String, String)]("select distinct '2014', mnemonic, league, city, name from teams order by mnemonic").list
+      } else {
+        teamsTable.filter(_.year === year).sortBy(_.mnemonic).list
+      }
     }
   }
   
-  def players(team: String): List[Player] = {
+  def players(team: String, year: String): List[Player] = {
     db.withSession { implicit session =>
-      val partitions = playersTable.filter(_.team === team).list.partition(_.position != "P")
-      partitions._1.sortBy(_.lastName) ++ partitions._2.sortBy(_.lastName)
+      if (year == "All") {
+        val groups = playersTable.filter(_.team === team).list.groupBy(_.id)
+        val players = groups.mapValues(_.head).values
+        val partitions = players.partition(_.position != "P")
+        partitions._1.toList.sortBy(_.lastName) ++ partitions._2.toList.sortBy(_.lastName)
+      } else {
+        val partitions = playersTable.filter({x => x.team === team && x.year === year}).list.partition(_.position != "P")
+        partitions._1.sortBy(_.lastName) ++ partitions._2.sortBy(_.lastName)        
+      } 
     }
   }
 
-  def playerSummary(playerID: String): PlayerData = {
+  def playerSummary(playerID: String, year: String): PlayerData = {
     db.withSession { implicit session =>
       val playerMnemonic = truePlayerID(playerID)
-      val player = playersTable.filter(_.mnemonic === playerMnemonic).list.head
-      val RHatBats = hitterRawRH.filter(_.playerID === playerMnemonic).map(_.RHatBat).sum.run.get
-      val LHatBats = hitterRawLH.filter(_.playerID === playerMnemonic).map(_.LHatBat).sum.run.get
-      val gamesQuery = for {
-                         r <- hitterRawLH if r.playerID === playerMnemonic;
-                         l <- hitterRawRH if (l.playerID === playerMnemonic && l.date === r.date)
-                       } yield (1)
-      val summary = PlayerSummary(playerMnemonic, RHatBats, LHatBats, gamesQuery.length.run)
-      PlayerData(player, summary)
+      if (year == "All") {
+        val player = playersTable.filter(_.mnemonic === playerMnemonic).list.head
+        val RHatBats = hitterRawRH.filter(_.playerID === playerMnemonic).map(_.RHatBat).sum.run.get
+        val LHatBats = hitterRawLH.filter(_.playerID === playerMnemonic).map(_.LHatBat).sum.run.get
+        val gamesQuery = for {
+                           r <- hitterRawLH if r.playerID === playerMnemonic;
+                           l <- hitterRawRH if (l.playerID === playerMnemonic && l.date === r.date)
+                         } yield (1)
+        val summary = PlayerSummary(playerMnemonic, RHatBats, LHatBats, gamesQuery.length.run)
+        PlayerData(player, summary)
+      } else {
+        val player = playersTable.filter({x => x.mnemonic === playerMnemonic && x.year.startsWith(year)}).list.head
+        val RHatBats = hitterRawRH.filter({x => x.playerID === playerMnemonic && x.date.startsWith(year)}).map(_.RHatBat).sum.run.get
+        val LHatBats = hitterRawLH.filter({x => x.playerID === playerMnemonic && x.date.startsWith(year)}).map(_.LHatBat).sum.run.get
+        val gamesQuery = for {
+                           r <- hitterRawLH if r.playerID === playerMnemonic && r.date.startsWith(year);
+                           l <- hitterRawRH if (l.playerID === playerMnemonic && l.date === r.date)
+                         } yield (1)
+        val summary = PlayerSummary(playerMnemonic, RHatBats, LHatBats, gamesQuery.length.run)
+        PlayerData(player, summary)        
+      }
     }
   }
   
@@ -78,90 +101,105 @@ class RetrosheetData {
   
   def years: List[String] = {
     db.withSession { implicit session =>
-      Q.queryNA[String]("select distinct(substring(date, 1, 4)) from games").list
+      "All" :: (Q.queryNA[String]("select distinct(substring(date, 1, 4)) as year from games order by year").list)
     }
   }
   
-  def playerBA(playerID: String): List[BattingAverageObservation] = {
+  def hitterStatsQuery(playerID: String, year: String): Query[HitterDailyStatsTable, HitterDailyStatsTable#TableElementType, Seq] = {
+    if (year == "All") hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date)
+    else hitterStats.filter({x => x.playerID === truePlayerID(playerID) && x.date.startsWith(year)}).sortBy(_.date)
+  }
+  
+  def hitterMovingStatsQuery(playerID: String, year: String): Query[HitterStatsMovingTable, HitterStatsMovingTable#TableElementType, Seq] = {
+    if (year == "All") hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date)
+    else hitterMovingStats.filter({x => x.playerID === truePlayerID(playerID) && x.date.startsWith(year)}).sortBy(_.date)
+  }
+  
+  def hitterVolatilityStatsQuery(playerID: String, year: String): Query[HitterStatsVolatilityTable, HitterStatsVolatilityTable#TableElementType, Seq] = {
+    if (year == "All") hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date)
+    else hitterVolatilityStats.filter({x => x.playerID === truePlayerID(playerID) && x.date.startsWith(year)}).sortBy(_.date)
+  }
+  
+  def playerBA(playerID: String, year: String): List[BattingAverageObservation] = {
     db.withSession { implicit session =>
-      val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.battingAverage, p.LHbattingAverage, p.RHbattingAverage)).list
+      val playerStats = hitterStatsQuery(playerID, year).map(p => (p.date, p.battingAverage, p.LHbattingAverage, p.RHbattingAverage)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerMovingBA(playerID: String): List[BattingAverageObservation] = {        
+  def playerMovingBA(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.battingAverage25, p.LHbattingAverage25, p.RHbattingAverage25)).list
+      val playerStats = hitterMovingStatsQuery(playerID, year).map(p => (p.date, p.battingAverage25, p.LHbattingAverage25, p.RHbattingAverage25)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerVolatilityBA(playerID: String): List[BattingAverageObservation] = {        
+  def playerVolatilityBA(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.battingVolatility100, p.LHbattingVolatility100, p.RHbattingVolatility100)).list
+      val playerStats = hitterVolatilityStatsQuery(playerID, year).map(p => (p.date, p.battingVolatility100, p.LHbattingVolatility100, p.RHbattingVolatility100)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerDailyBA(playerID: String): List[BattingAverageObservation] = {        
+  def playerDailyBA(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.dailyBattingAverage, p.LHdailyBattingAverage, p.RHdailyBattingAverage)).list
+      val playerStats = hitterStatsQuery(playerID, year).map(p => (p.date, p.dailyBattingAverage, p.LHdailyBattingAverage, p.RHdailyBattingAverage)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerFantasy(playerID: String): List[BattingAverageObservation] = {        
+  def playerFantasy(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.fantasyScore, p.LHfantasyScore, p.RHfantasyScore)).list
+      val playerStats = hitterStatsQuery(playerID, year).map(p => (p.date, p.fantasyScore, p.LHfantasyScore, p.RHfantasyScore)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerFantasyMoving(playerID: String): List[BattingAverageObservation] = {        
+  def playerFantasyMoving(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.fantasyScore25, p.LHfantasyScore25, p.RHfantasyScore25)).list
+      val playerStats = hitterMovingStatsQuery(playerID, year).map(p => (p.date, p.fantasyScore25, p.LHfantasyScore25, p.RHfantasyScore25)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
 
-  def playerSlugging(playerID: String): List[BattingAverageObservation] = {        
+  def playerSlugging(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingPercentage, p.LHsluggingPercentage, p.RHsluggingPercentage)).list
+      val playerStats = hitterStatsQuery(playerID, year).map(p => (p.date, p.sluggingPercentage, p.LHsluggingPercentage, p.RHsluggingPercentage)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerOnBase(playerID: String): List[BattingAverageObservation] = {        
+  def playerOnBase(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBasePercentage, p.LHonBasePercentage, p.RHonBasePercentage)).list
+      val playerStats = hitterStatsQuery(playerID, year).map(p => (p.date, p.onBasePercentage, p.LHonBasePercentage, p.RHonBasePercentage)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerSluggingMoving(playerID: String): List[BattingAverageObservation] = {        
+  def playerSluggingMoving(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingPercentage25, p.LHsluggingPercentage25, p.RHsluggingPercentage25)).list
+      val playerStats = hitterMovingStatsQuery(playerID, year).map(p => (p.date, p.sluggingPercentage25, p.LHsluggingPercentage25, p.RHsluggingPercentage25)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerOnBaseMoving(playerID: String): List[BattingAverageObservation] = {        
+  def playerOnBaseMoving(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterMovingStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBasePercentage25, p.LHonBasePercentage25, p.RHonBasePercentage25)).list
+      val playerStats = hitterMovingStatsQuery(playerID, year).map(p => (p.date, p.onBasePercentage25, p.LHonBasePercentage25, p.RHonBasePercentage25)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerSluggingVolatility(playerID: String): List[BattingAverageObservation] = {        
+  def playerSluggingVolatility(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.sluggingVolatility100, p.LHsluggingVolatility100, p.RHsluggingVolatility100)).list
+      val playerStats = hitterVolatilityStatsQuery(playerID, year).sortBy(_.date).map(p => (p.date, p.sluggingVolatility100, p.LHsluggingVolatility100, p.RHsluggingVolatility100)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }
   
-  def playerOnBaseVolatility(playerID: String): List[BattingAverageObservation] = {        
+  def playerOnBaseVolatility(playerID: String, year: String): List[BattingAverageObservation] = {        
     db.withSession { implicit session =>
-      val playerStats = hitterVolatilityStats.filter(_.playerID === truePlayerID(playerID)).sortBy(_.date).map(p => (p.date, p.onBaseVolatility100, p.LHonBaseVolatility100, p.RHonBaseVolatility100)).list
+      val playerStats = hitterVolatilityStatsQuery(playerID, year).sortBy(_.date).map(p => (p.date, p.onBaseVolatility100, p.LHonBaseVolatility100, p.RHonBaseVolatility100)).list
       playerStats.map({x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4))})
     }
   }

@@ -24,119 +24,122 @@ trait MLBRoutes extends HttpService {
       }
     } ~
     path("teams") {
-      respondWithMediaType(`application/json`) {
-        complete(retrosheetData.teams.toJson.toString)
+      parameters('year) { (year) =>
+        respondWithMediaType(`application/json`) {
+          complete(retrosheetData.teams(year).toJson.toString)
+        }
       }
     } ~
     path("players") {
-      parameters('team) { (team) => 
+      parameters('team, 'year) { (team, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.players(team).toJson.toString)
+          complete(retrosheetData.players(team, year).toJson.toString)
         }
       }
     } ~
     path("playerSummary") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.playerSummary(player).toJson.toString)
+          complete(retrosheetData.playerSummary(player, year).toJson.toString)
         }
       }
     } ~
     path("playerBA") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerBA(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerBA(player, year)))
         }
       }        
     } ~
     path("playerMovingBA") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerMovingBA(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerMovingBA(player, year)))
         }
       }        
     } ~
     path("playerVolatilityBA") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerVolatilityBA(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerVolatilityBA(player, year)))
         }
       }        
     } ~
     path("playerDailyBA") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerDailyBA(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerDailyBA(player, year)))
         }
       }        
     } ~
     path("playerFantasy") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerFantasy(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerFantasy(player, year)))
         }
       }        
     } ~
     path("playerFantasyMoving") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerFantasyMoving(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerFantasyMoving(player, year)))
         }
       }        
     } ~
     path("playerSlugging") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerSlugging(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerSlugging(player, year)))
         }
       }        
     } ~
     path("playerOnBase") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerOnBase(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerOnBase(player, year)))
         }
       }        
     } ~
     path("playerSluggingMoving") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerSluggingMoving(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerSluggingMoving(player, year)))
         }
       }        
     } ~
     path("playerOnBaseMoving") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerOnBaseMoving(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerOnBaseMoving(player, year)))
         }
       }        
     } ~
     path("playerSluggingVolatility") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerSluggingVolatility(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerSluggingVolatility(player, year)))
         }
       }        
     } ~
     path("playerOnBaseVolatility") {
-      parameters('player) { (player) => 
+      parameters('player, 'year) { (player, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerOnBaseVolatility(player)))
+          complete(retrosheetData.dataTable(retrosheetData.playerOnBaseVolatility(player, year)))
         }
       }        
     } ~
     path("graph") {
-      parameters('team.?, 'player.?) { (team, player) =>
+      parameters('team.?, 'player.?, 'year.?) { (team, player, year) =>
         val teamStr = team.getOrElse("")              
         val playerStr = player.getOrElse("")   
+        val yearStr = year.getOrElse("")   
         respondWithMediaType(`text/html`) {
           if (!teamStr.isEmpty) { 
-            complete(html.graph.render("").toString)
-          } else if (!playerStr.isEmpty) {
-            complete(html.graph.render(playerStr).toString)
+            complete(html.graph.render("", "").toString)
+          } else if (!playerStr.isEmpty && !yearStr.isEmpty) {
+            complete(html.graph.render(playerStr, yearStr).toString)
           } else {
-            complete(html.graph.render("").toString)
+            complete(html.graph.render("", "").toString)
           }
         }
       }

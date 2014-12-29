@@ -1,15 +1,31 @@
 $(document).ready(function(){
 	var loadingGraphs = 0;
   	$.ajax({
-		url: "/teams",
+		url: "/years",
 		cache: false
-	}).done (function (teams) {
-		$("#teamList").empty();
-		$.each(teams, function(key, val) {
-		    $("#teamList").append("<li id=\"" + val[0] + "\"><a href=\"#\">" + val[2] + " " + val[3] + "</a></li>");
+	}).done (function (years) {
+		$("#yearList").empty();
+		$.each(years, function(key, val) {
+		    $("#yearList").append("<li id=\"" + val + "\"><a href=\"#\">" + val + "</a></li>");
 		});
-		$("ul#teamList li").on('click', handleTeamSelect);
+		$("ul#yearList li").on('click', handleYearSelect);
 	});
+	function handleYearSelect() {
+		$("#selectedYearText").text(this.innerText);
+		$("#selectedTeamText").text('Team');
+		$("#selectedPlayerText").text('Players');
+		$("#playerSummary").html('');
+		$.ajax({
+			url: "/teams?year=" + $("#selectedYearText").text(),
+			cache: false
+		}).done (function (teams) {
+			$("#teamList").empty();
+			$.each(teams, function(key, val) {
+				$("#teamList").append("<li id=\"" + val[1] + "\"><a href=\"#\">" + val[3] + " " + val[4] + " (" + val[2] + ")</a></li>");
+			});
+			$("ul#teamList li").on('click', handleTeamSelect);
+		});
+	}
 	function handleTeamSelect() {
 		$("#selectedTeamText").text(this.innerText);
 		$("#selectedPlayerText").text('Players');
@@ -17,7 +33,7 @@ $(document).ready(function(){
 		$("#playerSummary").html('');
 		loadingGraphs = 0;
 		$.ajax({
-			url: "/players?team=" + this.id,
+			url: "/players?team=" + this.id + "&year=" + $("#selectedYearText").text(),
 			cache: false
 		}).done (function (players) {
 			$("ul#playerList").empty();
@@ -36,7 +52,7 @@ $(document).ready(function(){
 		loadingGraphs++;
 		if (loadingGraphs == 1) $("#playerSelectStatus").removeClass('hide');		
 		$.ajax({
-		  url: "/playerSummary?player=" + player,
+		  url: "/playerSummary?player=" + player + "&year=" + $("#selectedYearText").text(),
 		  dataType: "json",
 		  cache: false,
 		  success: function (data, textStatus, xhr) {
@@ -48,7 +64,7 @@ $(document).ready(function(){
 		  }
 		});
 		$.ajax({
-		  url: endpoint + "?player=" + player,
+		  url: endpoint + "?player=" + player + "&year=" + $("#selectedYearText").text(),
 		  dataType: "json",
 		  success: function (data, textStatus, xhr) {
 			// Create our data table out of JSON data loaded from server.
