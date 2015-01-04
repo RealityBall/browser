@@ -18,7 +18,9 @@ object RetrosheetRecords {
   
   case class Player(id: String, year: String, lastName: String, firstName: String, batsWith: String, throwsWith: String, team: String, position: String)
   case class PlayerSummary(id: String, RHatBats: Int, LHatBats: Int, games: Int)
+  case class PitcherSummary(id: String, wins: Int, losses: Int, saves: Int, games: Int)
   case class PlayerData(meta: Player, appearances: PlayerSummary)
+  case class PitcherData(meta: Player, appearances: PitcherSummary)
   
   case class PitcherDaily(id: String, date: String, var win: Boolean, var loss: Boolean, var save: Boolean,
                           var hits: Int, var walks: Int, var hitByPitch: Int, var strikeOuts: Int, var earnedRuns: Int, var outs: Int,
@@ -36,7 +38,9 @@ object RetrosheetJsonProtocol extends DefaultJsonProtocol {
   import RetrosheetRecords._
   implicit val playerFormat = jsonFormat8(Player)
   implicit val playerSummaryFormat = jsonFormat4(PlayerSummary)
+  implicit val pitcherSummaryFormat = jsonFormat5(PitcherSummary)
   implicit val playerDataFormat = jsonFormat2(PlayerData)
+  implicit val pitcherDataFormat = jsonFormat2(PitcherData)
 }
 
 class TeamsTable(tag: Tag)

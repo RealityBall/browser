@@ -11,6 +11,7 @@ object GoogleCellJsonProtocol extends DefaultJsonProtocol {
   implicit object GoogleCellFormat extends RootJsonFormat[GoogleCell] {
     def write(c: GoogleCell) = c.v match {
         case x: String => JsObject("v" -> JsString(x))
+        case x: Int => JsObject("v" -> JsNumber(x))
         case x: Double => JsObject("v" -> JsNumber(x))
         // TODO: Handle other basic types (e.g. Date)
     }
