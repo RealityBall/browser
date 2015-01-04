@@ -7,7 +7,7 @@ import spray.json._
 import spray.http._
 import MediaTypes._
 import DefaultJsonProtocol._ 
-import org.slf4j.{Logger, LoggerFactory}
+import _root_.org.slf4j.{Logger, LoggerFactory}
 
 trait MLBRoutes extends HttpService {
   
@@ -73,16 +73,16 @@ trait MLBRoutes extends HttpService {
       }        
     } ~
     path("playerFantasy") {
-      parameters('player, 'year) { (player, year) => 
+      parameters('player, 'year, 'gameName) { (player, year, gameName) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerFantasy(player, year)))
+          complete(retrosheetData.dataTable(retrosheetData.playerFantasy(player, year, gameName)))
         }
       }        
     } ~
     path("playerFantasyMoving") {
-      parameters('player, 'year) { (player, year) => 
+      parameters('player, 'year, 'gameName) { (player, year, gameName) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.dataTable(retrosheetData.playerFantasyMoving(player, year)))
+          complete(retrosheetData.dataTable(retrosheetData.playerFantasyMoving(player, year, gameName)))
         }
       }        
     } ~
