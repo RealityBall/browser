@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	var loadingGraphs = 0;
+	var selectedPlayer = '';
 	var batterCharts = ['chart_ba', 'chart_ba_moving', 'chart_ba_volatility', 'chart_ba_daily', 'chart_slg',
 					    'chart_obp', 'chart_slg_moving', 'chart_obp_moving', 'chart_slg_volatility',
 					    'chart_obp_volatility', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
@@ -17,8 +18,9 @@ $(document).ready(function(){
 	});
 	function handleYearSelect() {
 		$('#selectedYearText').text(this.innerText);
-		$('#selectedTeamText').text('Team');
-		$('#selectedPlayerText').text('Players');
+		if (selectedPlayer != '') {
+			$('#' + selectedPlayer).trigger('click');
+		}
 		$('#playerSummary').html('');
 		$.ajax({
 			url: '/teams?year=' + $('#selectedYearText').text(),
@@ -109,6 +111,7 @@ $(document).ready(function(){
 	}
 	function handlePlayerSelect() {
 		$('#selectedPlayerText').text(this.innerText);
+		selectedPlayer = this.id;
 		if ($('#selectedPlayerText').text().indexOf('(P)') == -1) {
 		  $('#playerSelectStatus').removeClass('hide');
 		  batterCharts.map(showChart);
