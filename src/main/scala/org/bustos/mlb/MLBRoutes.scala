@@ -58,6 +58,20 @@ trait MLBRoutes extends HttpService {
             complete(retrosheetData.dataNumericTable(retrosheetData.strikeRatio(player, year)))
           }
         }                
+      } ~
+      path("fantasy") {
+        parameters('player, 'year, 'gameName) { (player, year, gameName) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataNumericTable(retrosheetData.pitcherFantasy(player, year, gameName)))
+          }
+        }        
+      } ~
+      path("fantasyMoving") {
+        parameters('player, 'year, 'gameName) { (player, year, gameName) => 
+          respondWithMediaType(`application/json`) {
+            complete(retrosheetData.dataNumericTable(retrosheetData.pitcherFantasyMoving(player, year, gameName)))
+          }
+        }        
       }
     } ~
     pathPrefix("batter") {

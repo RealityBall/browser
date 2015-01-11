@@ -5,7 +5,8 @@ $(document).ready(function(){
 					    'chart_obp', 'chart_slg_moving', 'chart_obp_moving', 'chart_slg_volatility',
 					    'chart_obp_volatility', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
 					    'chart_draftkings_fantasy', 'chart_draftkings_fantasy_moving', 'chart_draftster_fantasy', 'chart_draftster_fantasy_moving'];
-	var pitcherCharts = ['chart_pitcher_outs', 'chart_pitcher_strikeratio'];
+	var pitcherCharts = ['chart_pitcher_outs', 'chart_pitcher_strikeratio', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
+					    'chart_draftkings_fantasy', 'chart_draftkings_fantasy_moving', 'chart_draftster_fantasy', 'chart_draftster_fantasy_moving'];
   	$.ajax({
 		url: '/years',
 		cache: false
@@ -138,6 +139,12 @@ $(document).ready(function(){
 		  pitcherCharts.map(showChart);
 		  drawSpecificChart(this.id, '/pitcher/outs', 'Outs', 'chart_pitcher_outs', '');
 		  drawSpecificChart(this.id, '/pitcher/strikeRatio', 'Strike Ratio', 'chart_pitcher_strikeratio', '');
+		  drawSpecificChart(this.id, '/pitcher/fantasy', 'Daily FanDuel score', 'chart_fanduel_fantasy', 'FanDuel');
+		  drawSpecificChart(this.id, '/pitcher/fantasyMoving', 'Moving average FanDuel score', 'chart_fanduel_fantasy_moving', 'FanDuel');
+		  drawSpecificChart(this.id, '/pitcher/fantasy', 'Daily DraftKings score', 'chart_draftkings_fantasy', 'DraftKings');
+		  drawSpecificChart(this.id, '/pitcher/fantasyMoving', 'Moving average DraftKings score', 'chart_draftkings_fantasy_moving', 'DraftKings');
+		  drawSpecificChart(this.id, '/pitcher/fantasy', 'Daily Draftster score', 'chart_draftster_fantasy', 'Draftster');
+		  drawSpecificChart(this.id, '/pitcher/fantasyMoving', 'Moving average Draftster score', 'chart_draftster_fantasy_moving', 'Draftster');
 		}
 	};
 });
