@@ -115,8 +115,8 @@ $(document).ready(function(){
 		selectedPlayer = this.id;
 		if ($('#selectedPlayerText').text().indexOf('(P)') == -1) {
 		  $('#playerSelectStatus').removeClass('hide');
-		  batterCharts.map(showChart);
 		  pitcherCharts.map(hideChart);
+		  batterCharts.map(showChart);
 		  drawSpecificChart(this.id, '/batter/BA', 'As of Date Batting Average', 'chart_ba', '');
 		  drawSpecificChart(this.id, '/batter/movingBA', '25 Day Batting Averages', 'chart_ba_moving', '');
 		  drawSpecificChart(this.id, '/batter/volatilityBA', '100 Day Batting Average Volatility', 'chart_ba_volatility', '');
