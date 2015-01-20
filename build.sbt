@@ -1,6 +1,6 @@
 import com.typesafe.sbt.SbtStartScript
 
-name := "MLB"
+name := "browser"
 
 version := "1.0"
 
