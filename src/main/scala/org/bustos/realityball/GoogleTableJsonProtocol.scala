@@ -1,4 +1,4 @@
-package org.bustos.mlb
+package org.bustos.realityball
 
 import spray.json._
 import DefaultJsonProtocol._ 

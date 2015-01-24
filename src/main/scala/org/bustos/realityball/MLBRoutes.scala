@@ -1,4 +1,4 @@
-package org.bustos.mlb
+package org.bustos.realityball
 
 import spray.can.Http
 import spray.can.server.UHttp
@@ -11,9 +11,9 @@ import _root_.org.slf4j.{Logger, LoggerFactory}
 
 trait MLBRoutes extends HttpService {
   
-  import RetrosheetJsonProtocol._
+  import RealityballJsonProtocol._
   
-  val retrosheetData = new RetrosheetData
+  val retrosheetData = new RealityballData
   val logger = LoggerFactory.getLogger(getClass)
 
   val mlbRoutes = {

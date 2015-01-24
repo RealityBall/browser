@@ -1,4 +1,4 @@
-package org.bustos.mlb
+package org.bustos.realityball
 
 import org.specs2.mutable.Specification
 import spray.testkit.Specs2RouteTest

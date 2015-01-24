@@ -1,4 +1,4 @@
-package org.bustos.mlb
+package org.bustos.realityball
 
 import akka.actor.{ ActorSystem, Actor, Props, ActorLogging, ActorRef, ActorRefFactory }
 import akka.io.IO

@@ -1,11 +1,11 @@
-package org.bustos.mlb
+package org.bustos.realityball
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.lifted.{ProvenShape, ForeignKeyQuery}
 import spray.json._
 import DefaultJsonProtocol._
 
-object RetrosheetRecords {
+object RealityballRecords {
   import scala.collection.mutable.Queue
 
   case class Statistic(var total: Double, var rh: Double, var lh: Double)
@@ -21,7 +21,7 @@ object RetrosheetRecords {
   case class PlayerData(meta: Player, appearances: PlayerSummary)
   case class PitcherData(meta: Player, appearances: PitcherSummary)
   
-  case class PitcherDaily(id: String, date: String, var win: Int, var loss: Int, var save: Int,
+  case class PitcherDaily(id: String, game: String, date: String, opposing: String, var win: Int, var loss: Int, var save: Int,
                           var hits: Int, var walks: Int, var hitByPitch: Int, var strikeOuts: Int, var earnedRuns: Int, var outs: Int,
                           var shutout: Boolean, var noHitter: Boolean, var pitches: Int, var balls: Int)
   
@@ -35,9 +35,9 @@ object RetrosheetRecords {
   case class Ballpark(id: String, name: String, aka: String, city: String, state: String, start: String, end: String, league: String, notes: String)
 }
 
-import RetrosheetRecords._
-object RetrosheetJsonProtocol extends DefaultJsonProtocol {
-  import RetrosheetRecords._
+import RealityballRecords._
+object RealityballJsonProtocol extends DefaultJsonProtocol {
+  import RealityballRecords._
   implicit val playerFormat = jsonFormat8(Player)
   implicit val playerSummaryFormat = jsonFormat4(PlayerSummary)
   implicit val pitcherSummaryFormat = jsonFormat5(PitcherSummary)
@@ -127,7 +127,10 @@ class GameScoringTable(tag: Tag) extends Table[GameScoring](tag, "gameScoring") 
 }
 
 class PitcherDailyTable(tag: Tag) extends Table[PitcherDaily](tag, "pitcherDaily") {
-  def id = column[String]("id"); def date = column[String]("date");
+  def id = column[String]("id"); 
+  def game = column[String]("game"); 
+  def date = column[String]("date")
+  def opposing = column[String]("opposing")
   
   def win = column[Int]("win")
   def loss = column[Int]("loss")
@@ -143,9 +146,9 @@ class PitcherDailyTable(tag: Tag) extends Table[PitcherDaily](tag, "pitcherDaily
   def pitches = column[Int]("pitches")
   def balls = column[Int]("balls")
 
-  def pk = index("pk_id_date", (id, date)) // Duplicate issue with Joaquin Benoit on 20100910
+  def pk = index("pk_id_date", (id, game)) // Duplicate issue with Joaquin Benoit on 20100910
       
-  def * = (id, date, win, loss, save, hits, walks, hitByPitch, strikeOuts, earnedRuns, outs, shutout, noHitter, pitches, balls) <> (PitcherDaily.tupled, PitcherDaily.unapply)
+  def * = (id, game, date, opposing, win, loss, save, hits, walks, hitByPitch, strikeOuts, earnedRuns, outs, shutout, noHitter, pitches, balls) <> (PitcherDaily.tupled, PitcherDaily.unapply)
 }
 
 class PlayersTable(tag: Tag) extends Table[Player](tag, "players") {
@@ -200,13 +203,14 @@ class HitterRawRHStatsTable(tag: Tag) extends Table[(String, String, Int, Int, I
     (date, id, RHatBat, RHsingle, RHdouble, RHtriple, RHhomeRun, RHRBI, RHbaseOnBalls, RHhitByPitch, RHsacFly, RHsacHit)
 }
 
-class HitterDailyStatsTable(tag: Tag) extends Table[(String, String, 
+class HitterDailyStatsTable(tag: Tag) extends Table[(String, String, Int, Int, Int,
       Option[Double], Option[Double], Option[Double], 
       Option[Double], Option[Double], Option[Double], 
       Option[Double], Option[Double], Option[Double], 
       Option[Double], Option[Double], Option[Double])](tag, "hitterDailyStats") {
 
-  def date = column[String]("date"); def id = column[String]("id");
+  def date = column[String]("date"); def id = column[String]("id"); def lineupPosition = column[Int]("lineupPosition"); 
+  def atBats = column[Int]("ab"); def plateAppearances = column[Int]("pa")
   def RHdailyBattingAverage = column[Option[Double]]("RHdailyBattingAverage")
   def LHdailyBattingAverage = column[Option[Double]]("LHdailyBattingAverage")
   def dailyBattingAverage = column[Option[Double]]("dailyBattingAverage")
@@ -222,7 +226,7 @@ class HitterDailyStatsTable(tag: Tag) extends Table[(String, String,
 
   def pk = index("pk_id_date", (id, date)) // First game of double headers are ignored for now
       
-  def * = (date, id, 
+  def * = (date, id, lineupPosition, atBats, plateAppearances,
            RHdailyBattingAverage, LHdailyBattingAverage, dailyBattingAverage,  
            RHbattingAverage, LHbattingAverage, battingAverage,  
            RHonBasePercentage, LHonBasePercentage, onBasePercentage, 
@@ -326,49 +330,28 @@ class HitterStatsVolatilityTable(tag: Tag) extends Table[(String, String,
 }
 
 class PitcherFantasyTable(tag: Tag) extends Table[(String, String, 
-      Option[Double], Option[Double], Option[Double], 
-      Option[Double], Option[Double], Option[Double], 
       Option[Double], Option[Double], Option[Double])](tag, "pitcherFantasyStats") {
 
   def date = column[String]("date"); def id = column[String]("id");
-  def RHfanDuel = column[Option[Double]]("RHfanDuel")
-  def LHfanDuel = column[Option[Double]]("LHfanDuel")
   def fanDuel = column[Option[Double]]("fanDuel")
-  def RHdraftKings = column[Option[Double]]("RHdraftKings")
-  def LHdraftKings = column[Option[Double]]("LHdraftKings")
   def draftKings = column[Option[Double]]("draftKings")
-  def RHdraftster = column[Option[Double]]("RHdraftster")
-  def LHdraftster = column[Option[Double]]("LHdraftster")
   def draftster = column[Option[Double]]("draftster")
 
   def pk = index("pk_id_date", (id, date))
       
-  def * = (date, id, 
-           RHfanDuel, LHfanDuel, fanDuel,
-           RHdraftKings, LHdraftKings, draftKings,
-           RHdraftster, LHdraftster, draftster)
+  def * = (date, id, fanDuel, draftKings, draftster)
 }
 
 class PitcherFantasyMovingTable(tag: Tag) extends Table[(String, String, 
-      Option[Double], Option[Double], Option[Double], 
-      Option[Double], Option[Double], Option[Double], 
       Option[Double], Option[Double], Option[Double])](tag, "pitcherFantasyMovingStats") {
 
   def date = column[String]("date"); def id = column[String]("id");
-  def RHfanDuelMov = column[Option[Double]]("RHfanDuelMov")
-  def LHfanDuelMov = column[Option[Double]]("LHfanDuelMov")
   def fanDuelMov = column[Option[Double]]("fanDuelMov")
-  def RHdraftKingsMov = column[Option[Double]]("RHdraftKingsMov")
-  def LHdraftKingsMov = column[Option[Double]]("LHdraftKingsMov")
   def draftKingsMov = column[Option[Double]]("draftKingsMov")
-  def RHdraftsterMov = column[Option[Double]]("RHdraftsterMov")
-  def LHdraftsterMov = column[Option[Double]]("LHdraftsterMov")
   def draftsterMov = column[Option[Double]]("draftsterMov")
 
   def pk = index("pk_id_date", (id, date))
       
-  def * = (date, id, 
-           RHfanDuelMov, LHfanDuelMov, fanDuelMov,
-           RHdraftKingsMov, LHdraftKingsMov, draftKingsMov,
-           RHdraftsterMov, LHdraftsterMov, draftsterMov)
+  def * = (date, id, fanDuelMov, draftKingsMov, draftsterMov)
 }
+

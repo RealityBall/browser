@@ -1,4 +1,4 @@
-package org.bustos.mlb
+package org.bustos.realityball
 
 import java.security.{ SecureRandom, KeyStore }
 import javax.net.ssl.{ KeyManagerFactory, SSLContext, TrustManagerFactory }

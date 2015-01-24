@@ -1,14 +1,15 @@
-package org.bustos.mlb
+package org.bustos.realityball
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.util.Properties.envOrNone
 import spray.json._
 import DefaultJsonProtocol._ 
 import scala.slick.jdbc.{GetResult, StaticQuery => Q}
+import RealityballConfig._
 
-class RetrosheetData {
+class RealityballData {
 
-  import RetrosheetRecords._
+  import RealityballRecords._
   import GoogleTableJsonProtocol._
   
   val hitterRawLH: TableQuery[HitterRawLHStatsTable] = TableQuery[HitterRawLHStatsTable]
@@ -25,14 +26,6 @@ class RetrosheetData {
   val teamsTable: TableQuery[TeamsTable] = TableQuery[TeamsTable]
   val playersTable: TableQuery[PlayersTable] = TableQuery[PlayersTable]
   
-  //val db = Database.forURL("jdbc:mysql://localhost:3306/mlbretrosheet", driver="com.mysql.jdbc.Driver", user="root", password="")
-  
-  val mysqlURL = envOrNone("MLB_MYSQL_URL").get
-  val mysqlUser = envOrNone("MLB_MYSQL_USER").get
-  val mysqlPassword = envOrNone("MLB_MYSQL_PASSWORD").get
-
-  val db = Database.forURL(mysqlURL, driver="com.mysql.jdbc.Driver", user=mysqlUser, password=mysqlPassword)
-
   def teams(year: String): List[(String, String, String, String, String)] = {
     db.withSession { implicit session =>
       if (year == "All") {
