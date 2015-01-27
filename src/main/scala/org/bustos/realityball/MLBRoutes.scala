@@ -13,27 +13,27 @@ trait MLBRoutes extends HttpService {
   
   import RealityballJsonProtocol._
   
-  val retrosheetData = new RealityballData
+  val realityballData = new RealityballData
   val logger = LoggerFactory.getLogger(getClass)
 
   val mlbRoutes = {
     getFromResourceDirectory("webapp") ~
     path("years") {
       respondWithMediaType(`application/json`) {
-        complete(retrosheetData.years.toJson.toString)
+        complete(realityballData.years.toJson.toString)
       }
     } ~
     path("teams") {
       parameters('year) { (year) =>
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.teams(year).toJson.toString)
+          complete(realityballData.teams(year).toJson.toString)
         }
       }
     } ~
     path("players") {
       parameters('team, 'year) { (team, year) => 
         respondWithMediaType(`application/json`) {
-          complete(retrosheetData.players(team, year).toJson.toString)
+          complete(realityballData.players(team, year).toJson.toString)
         }
       }
     } ~
@@ -41,35 +41,35 @@ trait MLBRoutes extends HttpService {
       path("summary") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.pitcherSummary(player, year).toJson.toString)
+            complete(realityballData.pitcherSummary(player, year).toJson.toString)
           }
         }
       } ~
       path("outs") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataNumericTable(retrosheetData.outs(player, year)))
+            complete(realityballData.dataNumericTable(realityballData.outs(player, year)))
           }
         }        
       } ~
       path("strikeRatio") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataNumericTable(retrosheetData.strikeRatio(player, year)))
+            complete(realityballData.dataNumericTable(realityballData.strikeRatio(player, year)))
           }
         }                
       } ~
       path("fantasy") {
         parameters('player, 'year, 'gameName) { (player, year, gameName) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataNumericTable(retrosheetData.pitcherFantasy(player, year, gameName)))
+            complete(realityballData.dataNumericTable(realityballData.pitcherFantasy(player, year, gameName)))
           }
         }        
       } ~
       path("fantasyMoving") {
         parameters('player, 'year, 'gameName) { (player, year, gameName) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataNumericTable(retrosheetData.pitcherFantasyMoving(player, year, gameName)))
+            complete(realityballData.dataNumericTable(realityballData.pitcherFantasyMoving(player, year, gameName)))
           }
         }        
       }
@@ -78,91 +78,91 @@ trait MLBRoutes extends HttpService {
       path("summary") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.batterSummary(player, year).toJson.toString)
+            complete(realityballData.batterSummary(player, year).toJson.toString)
           }
         }
       } ~
       path("BA") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.BA(player, year)))
+            complete(realityballData.dataTable(realityballData.BA(player, year)))
           }
         }        
       } ~
       path("movingBA") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.movingBA(player, year)))
+            complete(realityballData.dataTable(realityballData.movingBA(player, year)))
           }
         }        
       } ~
       path("volatilityBA") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.volatilityBA(player, year)))
+            complete(realityballData.dataTable(realityballData.volatilityBA(player, year)))
           }
         }        
       } ~
       path("dailyBA") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.dailyBA(player, year)))
+            complete(realityballData.dataTable(realityballData.dailyBA(player, year)))
           }
         }        
       } ~
       path("fantasy") {
         parameters('player, 'year, 'gameName) { (player, year, gameName) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.fantasy(player, year, gameName)))
+            complete(realityballData.dataTable(realityballData.fantasy(player, year, gameName)))
           }
         }        
       } ~
       path("fantasyMoving") {
         parameters('player, 'year, 'gameName) { (player, year, gameName) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.fantasyMoving(player, year, gameName)))
+            complete(realityballData.dataTable(realityballData.fantasyMoving(player, year, gameName)))
           }
         }        
       } ~
       path("slugging") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.slugging(player, year)))
+            complete(realityballData.dataTable(realityballData.slugging(player, year)))
           }
         }        
       } ~
       path("onBase") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.onBase(player, year)))
+            complete(realityballData.dataTable(realityballData.onBase(player, year)))
           }
         }        
       } ~
       path("sluggingMoving") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.sluggingMoving(player, year)))
+            complete(realityballData.dataTable(realityballData.sluggingMoving(player, year)))
           }
         }        
       } ~
       path("onBaseMoving") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.onBaseMoving(player, year)))
+            complete(realityballData.dataTable(realityballData.onBaseMoving(player, year)))
           }
         }        
       } ~
       path("sluggingVolatility") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.sluggingVolatility(player, year)))
+            complete(realityballData.dataTable(realityballData.sluggingVolatility(player, year)))
           }
         }        
       } ~
       path("onBaseVolatility") {
         parameters('player, 'year) { (player, year) => 
           respondWithMediaType(`application/json`) {
-            complete(retrosheetData.dataTable(retrosheetData.onBaseVolatility(player, year)))
+            complete(realityballData.dataTable(realityballData.onBaseVolatility(player, year)))
           }
         }        
       }
