@@ -17,8 +17,8 @@ object RealityballRecords {
   case class BattingAverageObservation(date: String, bAvg: Double, lhBAvg: Double, rhBAvg: Double)
 
   case class Player(id: String, year: String, lastName: String, firstName: String, batsWith: String, throwsWith: String, team: String, position: String)
-  case class PlayerSummary(id: String, RHatBats: Int, LHatBats: Int, games: Int)
-  case class PitcherSummary(id: String, wins: Int, losses: Int, saves: Int, games: Int)
+  case class PlayerSummary(id: String, RHatBats: Int, LHatBats: Int, games: Int, mlbId: String, brefId: String, espnId: String)
+  case class PitcherSummary(id: String, wins: Int, losses: Int, saves: Int, games: Int, mlbId: String, brefId: String, espnId: String)
   case class PlayerData(meta: Player, appearances: PlayerSummary)
   case class PitcherData(meta: Player, appearances: PitcherSummary)
 
@@ -67,8 +67,8 @@ import RealityballRecords._
 object RealityballJsonProtocol extends DefaultJsonProtocol {
   import RealityballRecords._
   implicit val playerFormat = jsonFormat8(Player)
-  implicit val playerSummaryFormat = jsonFormat4(PlayerSummary)
-  implicit val pitcherSummaryFormat = jsonFormat5(PitcherSummary)
+  implicit val playerSummaryFormat = jsonFormat7(PlayerSummary)
+  implicit val pitcherSummaryFormat = jsonFormat8(PitcherSummary)
   implicit val playerDataFormat = jsonFormat2(PlayerData)
   implicit val pitcherDataFormat = jsonFormat2(PitcherData)
 }
@@ -195,7 +195,7 @@ class PlayersTable(tag: Tag) extends Table[Player](tag, "players") {
 
 class IdMappingTable(tag: Tag) extends Table[IdMapping](tag, "idMapping") {
   def mlbId = column[String]("mlbId"); def mlbName = column[String]("mlbName"); def mlbTeam = column[String]("mlbTeam")
-  def brefId = column[String]("refId"); def brefName = column[String]("brefName");
+  def brefId = column[String]("brefId"); def brefName = column[String]("brefName");
   def espnId = column[String]("espnId"); def espnName = column[String]("espnName");
   def retroId = column[String]("retroId"); def retroName = column[String]("retroName");
 

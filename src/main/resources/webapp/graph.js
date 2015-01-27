@@ -69,12 +69,18 @@ $(document).ready(function(){
 		  dataType: 'json',
 		  cache: false,
 		  success: function (data, textStatus, xhr) {
+		  	var externalLinks = '';
+		  	if (data.appearances.mlbId.length > 0) externalLinks = externalLinks.concat('<a href=\'http://mlb.mlb.com/team/player.jsp?player_id=' + data.appearances.mlbId + '\' target=\'_blank\'><strong>&nbsp;&nbsp;&nbsp;mlb.com</strong></a>');
+		  	if (data.appearances.espnId.length > 0) externalLinks = externalLinks.concat('<a href=\'http://espn.go.com/mlb/player/_/id/' + data.appearances.espnId + '\' target=\'_blank\'><strong>&nbsp;&nbsp;&nbsp;espn.com</strong></a>');
+		  	if (data.appearances.brefId.length > 0) externalLinks = externalLinks.concat('<a href=\'http://www.baseball-reference.com/players/' + data.appearances.brefId[0] + '/' + data.appearances.brefId + '.shtml\' target=\'_blank\'><strong>&nbsp;&nbsp;bref.com</strong></a>');
 		  	if (isBatter) {
 			  	$('#playerSummary').html('<b>Bats:</b> ' + data.meta.batsWith + ', <b>Throws:</b> ' + data.meta.throwsWith + ', <b>RH At Bats:</b> ' + 
-			  							 data.appearances.RHatBats + ', <b>LH At Bats:</b> ' + data.appearances.LHatBats + ', <b>Games:</b> ' + data.appearances.games);
+			  							 data.appearances.RHatBats + ', <b>LH At Bats:</b> ' + data.appearances.LHatBats + ', <b>Games:</b> ' + data.appearances.games +
+			  							 externalLinks);
 			} else {
 			  	$('#playerSummary').html('<b>Bats:</b> ' + data.meta.batsWith + ', <b>Throws:</b> ' + data.meta.throwsWith + ', <b>Wins:</b> ' + 
-			  							 data.appearances.wins + ', <b>Losses:</b> ' + data.appearances.losses + ', <b>Saves:</b> ' + data.appearances.saves);
+			  							 data.appearances.wins + ', <b>Losses:</b> ' + data.appearances.losses + ', <b>Saves:</b> ' + data.appearances.saves +
+			  							 externalLinks);
 			}
 		  },
 		  error: function (xhr, textStatus, errorThrown) {
