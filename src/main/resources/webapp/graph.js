@@ -5,7 +5,7 @@ $(document).ready(function(){
 					    'chart_obp', 'chart_slg_moving', 'chart_obp_moving', 'chart_slg_volatility',
 					    'chart_obp_volatility', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
 					    'chart_draftkings_fantasy', 'chart_draftkings_fantasy_moving', 'chart_draftster_fantasy', 'chart_draftster_fantasy_moving'];
-	var pitcherCharts = ['chart_pitcher_outs', 'chart_pitcher_strikeratio', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
+	var pitcherCharts = ['chart_pitcher_outs', 'chart_pitcher_style', 'chart_pitcher_strikeratio', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
 					    'chart_draftkings_fantasy', 'chart_draftkings_fantasy_moving', 'chart_draftster_fantasy', 'chart_draftster_fantasy_moving'];
   	$.ajax({
 		url: '/years',
@@ -100,8 +100,26 @@ $(document).ready(function(){
 			var options = {
 				title: title
 			};
-			var chart = new google.visualization.LineChart(document.getElementById(chartName));
-			chart.draw(dataTable, options);      
+			if (title == 'Outs') {
+				var options = {
+					title: title,
+					isStacked: true,
+					legend: { position: 'bottom' }
+ 				};
+				var chart = new google.visualization.SteppedAreaChart(document.getElementById(chartName));
+				chart.draw(dataTable, options);      
+			} else if (title == 'Outs Types') {
+				var options = {
+					title: title,
+					isStacked: true,
+					legend: 'none'
+				};
+				var chart = new google.visualization.PieChart(document.getElementById(chartName));
+				chart.draw(dataTable, options);      
+			} else {
+				var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				chart.draw(dataTable, options);      
+			}
 			loadingGraphs--;
 			if (loadingGraphs <= 0) $('#playerSelectStatus').addClass('hide');		
 		  },
@@ -144,6 +162,7 @@ $(document).ready(function(){
 		  batterCharts.map(hideChart);
 		  pitcherCharts.map(showChart);
 		  drawSpecificChart(this.id, '/pitcher/outs', 'Outs', 'chart_pitcher_outs', '');
+		  drawSpecificChart(this.id, '/pitcher/outsTypes', 'Outs Types', 'chart_pitcher_style', '');
 		  drawSpecificChart(this.id, '/pitcher/strikeRatio', 'Strike Ratio', 'chart_pitcher_strikeratio', '');
 		  drawSpecificChart(this.id, '/pitcher/fantasy', 'Daily FanDuel score', 'chart_fanduel_fantasy', 'FanDuel');
 		  drawSpecificChart(this.id, '/pitcher/fantasyMoving', 'Moving average FanDuel score', 'chart_fanduel_fantasy_moving', 'FanDuel');
