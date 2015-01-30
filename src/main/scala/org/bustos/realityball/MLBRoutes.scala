@@ -37,6 +37,43 @@ trait MLBRoutes extends HttpService {
           }
         }
       } ~
+      pathPrefix("team") {
+        path("fantasy") {
+          parameters('team, 'year) { (team, year) =>
+            respondWithMediaType(`application/json`) {
+              complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, year), List("Total", "25 Day")))
+            }
+          }
+        } ~
+          path("ballparkBA") {
+            parameters('team, 'year) { (team, year) =>
+              respondWithMediaType(`application/json`) {
+                complete(realityballData.dataTable(realityballData.ballparkBA(team, year)))
+              }
+            }
+          } ~
+          path("ballparkAttendance") {
+            parameters('team, 'year) { (team, year) =>
+              respondWithMediaType(`application/json`) {
+                complete(realityballData.dataNumericTable(realityballData.ballparkAttendance(team, year), "Total"))
+              }
+            }
+          } ~
+          path("ballparkTemp") {
+            parameters('team, 'year) { (team, year) =>
+              respondWithMediaType(`application/json`) {
+                complete(realityballData.dataNumericTable(realityballData.ballparkTemp(team, year), "Temp (F)"))
+              }
+            }
+          } ~
+          path("schedule") {
+            parameters('team, 'year) { (team, year) =>
+              respondWithMediaType(`application/json`) {
+                complete(realityballData.schedule(team, year).toJson.toString)
+              }
+            }
+          }
+      } ~
       pathPrefix("pitcher") {
         path("summary") {
           parameters('player, 'year) { (player, year) =>
@@ -62,21 +99,21 @@ trait MLBRoutes extends HttpService {
           path("strikeRatio") {
             parameters('player, 'year) { (player, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable(realityballData.strikeRatio(player, year)))
+                complete(realityballData.dataNumericTable(realityballData.strikeRatio(player, year), "Strike / Total"))
               }
             }
           } ~
           path("fantasy") {
             parameters('player, 'year, 'gameName) { (player, year, gameName) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable(realityballData.pitcherFantasy(player, year, gameName)))
+                complete(realityballData.dataNumericTable(realityballData.pitcherFantasy(player, year, gameName), "Score"))
               }
             }
           } ~
           path("fantasyMoving") {
             parameters('player, 'year, 'gameName) { (player, year, gameName) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable(realityballData.pitcherFantasyMoving(player, year, gameName)))
+                complete(realityballData.dataNumericTable(realityballData.pitcherFantasyMoving(player, year, gameName), "Score Moving"))
               }
             }
           }
