@@ -1,5 +1,6 @@
 $(document).ready(function(){
-	var loadingGraphs = 0;
+	var loadingPlayerGraphs = 0;
+	var loadingTeamGraphs = 0;
 	var selectedPlayer = '';
 	var selectedTeam = '';
 	var batterCharts = ['chart_ba', 'chart_ba_moving', 'chart_ba_volatility', 'chart_ba_daily', 'chart_slg',
@@ -23,6 +24,8 @@ $(document).ready(function(){
 		$('#selectedYearText').text(this.innerText);
 		if (selectedPlayer != '') {
 			$('#' + selectedPlayer).trigger('click');
+		} else if (selectedTeam != '') {
+			$('#' + selectedTeam).trigger('click');
 		}
 		$('#playerSummary').html('');
 		$.ajax({
@@ -39,13 +42,14 @@ $(document).ready(function(){
 	function handleTeamSelect() {
 		$('#selectedTeamText').text(this.innerText);
 		$('#selectedPlayerText').text('Players');
-		$('#playerSelectStatus').addClass('hide');
+		$('#teamSelectStatus').removeClass('hide');
+		$('#schedule').removeClass('hide');
 		$('#playerSummary').html('');
 		selectedTeam = this.id;
 		batterCharts.map(hideChart);
 		pitcherCharts.map(hideChart);
 		teamCharts.map(showChart);
-		loadingGraphs = 0;
+		loadingPlayerGraphs = 0;
 		var parameters = 'team=' + this.id + '&year=' + $('#selectedYearText').text();
 		$.ajax({
 			url: '/players?' + parameters,
@@ -87,8 +91,9 @@ $(document).ready(function(){
 					);
 			});
 		});
+		loadingTeamGraphs = 4;
 		getDataAndDrawChart('/team/fantasy?' + parameters, 'Total Fantasy Score', 'chart_team_fantasy', '');
-		getDataAndDrawChart('/team/ballparkBA?' + parameters, 'Ballpark Batting Average', 'chart_ballpark_ba', '');
+		getDataAndDrawChart('/team/ballparkBA?' + parameters, '25 Day Ballpark Batting Average', 'chart_ballpark_ba', '');
 		getDataAndDrawChart('/team/ballparkTemp?' + parameters, 'Ballpark Temp Forecast', 'chart_ballpark_temp', '');
 		getDataAndDrawChart('/team/ballparkAttendance?' + parameters, 'Ballpark Attendance', 'chart_ballpark_attendance', '');
 	};
@@ -99,9 +104,6 @@ $(document).ready(function(){
 		  success: function (data, textStatus, xhr) {
 			// Create our data table out of JSON data loaded from server.
 			var dataTable = new google.visualization.DataTable(data);
-			var options = {
-				title: title
-			};
 			if (title == 'Outs') {
 				var options = {
 					title: title,
@@ -109,7 +111,6 @@ $(document).ready(function(){
 					legend: { position: 'bottom' }
  				};
 				var chart = new google.visualization.SteppedAreaChart(document.getElementById(chartName));
-				chart.draw(dataTable, options);      
 			} else if (title == 'Outs Types') {
 				var options = {
 					title: title,
@@ -117,13 +118,41 @@ $(document).ready(function(){
 					legend: 'none'
 				};
 				var chart = new google.visualization.PieChart(document.getElementById(chartName));
-				chart.draw(dataTable, options);      
-			} else {
+			} else if (title == 'Ballpark Attendance') {
+				var options = {
+					title: title,
+					vAxis: {maxValue: 50000, minValue: 0, gridlines: {count: 6}}
+ 				};
 				var chart = new google.visualization.LineChart(document.getElementById(chartName));
-				chart.draw(dataTable, options);      
+			} else if (title == '25 Day Ballpark Batting Average') {
+				var options = {
+					title: title,
+					vAxis: {maxValue: 0.5, minValue: 0, gridlines: {count: 6}}
+ 				};
+				var chart = new google.visualization.LineChart(document.getElementById(chartName));
+			} else if (title == 'Ballpark Temp Forecast') {
+				var options = {
+					title: title,
+					vAxis: {maxValue: 100, minValue: 0},
+ 				};
+				var chart = new google.visualization.LineChart(document.getElementById(chartName));
+			} else if (title == 'Total Fantasy Score') {
+				var options = {
+					title: title,
+					vAxis: {maxValue: 100, minValue: 0}
+ 				};
+				var chart = new google.visualization.LineChart(document.getElementById(chartName));
+			} else {
+				var options = {
+					title: title
+				};
+				var chart = new google.visualization.LineChart(document.getElementById(chartName));
 			}
-			loadingGraphs--;
-			if (loadingGraphs <= 0) $('#playerSelectStatus').addClass('hide');		
+			chart.draw(dataTable, options);      
+			loadingPlayerGraphs--;
+			if (loadingPlayerGraphs <= 0) $('#playerSelectStatus').addClass('hide');		
+			loadingTeamGraphs--;
+			if (loadingTeamGraphs <= 0) $('#teamSelectStatus').addClass('hide');		
 		  },
 		  error: function (xhr, textStatus, errorThrown) {
 			console.log(textStatus);
@@ -131,9 +160,9 @@ $(document).ready(function(){
 		});
 	};
 	function drawPlayerChart(player, endpoint, title, chartName, gameName) {
-		loadingGraphs++;
+		loadingPlayerGraphs++;
 		var isBatter = $('#selectedPlayerText').text().indexOf('(P)') == -1;
-		if (loadingGraphs == 1) $('#playerSelectStatus').removeClass('hide');		
+		if (loadingPlayerGraphs == 1) $('#playerSelectStatus').removeClass('hide');		
 		var summaryUrl = '/batter/summary?player=' + player + '&year=' + $('#selectedYearText').text();
 		if (!isBatter) {
 			summaryUrl = '/pitcher/summary?player=' + player + '&year=' + $('#selectedYearText').text();
@@ -175,6 +204,7 @@ $(document).ready(function(){
 	}
 	function handlePlayerSelect() {
 		$('#selectedPlayerText').text(this.innerText);
+		$('#schedule').addClass('hide');
 		selectedPlayer = this.id;
 		if ($('#selectedPlayerText').text().indexOf('(P)') == -1) {
 		  $('#playerSelectStatus').removeClass('hide');
