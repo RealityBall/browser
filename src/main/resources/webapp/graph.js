@@ -208,9 +208,9 @@ $(document).ready(function(){
 		selectedPlayer = this.id;
 		if ($('#selectedPlayerText').text().indexOf('(P)') == -1) {
 		  $('#playerSelectStatus').removeClass('hide');
-		  batterCharts.map(showChart);
 		  pitcherCharts.map(hideChart);
 		  teamCharts.map(hideChart);
+		  batterCharts.map(showChart);
 		  drawPlayerChart(this.id, '/batter/BA', 'As of Date Batting Average', 'chart_ba', '');
 		  drawPlayerChart(this.id, '/batter/movingBA', '25 Day Batting Averages', 'chart_ba_moving', '');
 		  drawPlayerChart(this.id, '/batter/volatilityBA', '100 Day Batting Average Volatility', 'chart_ba_volatility', '');
@@ -230,8 +230,8 @@ $(document).ready(function(){
 		} else {
 		  $('#playerSelectStatus').removeClass('hide');
 		  batterCharts.map(hideChart);
-		  pitcherCharts.map(showChart);
 		  teamCharts.map(hideChart);
+		  pitcherCharts.map(showChart);
 		  drawPlayerChart(this.id, '/pitcher/outs', 'Outs', 'chart_pitcher_outs', '');
 		  drawPlayerChart(this.id, '/pitcher/outsTypes', 'Outs Types', 'chart_pitcher_style', '');
 		  drawPlayerChart(this.id, '/pitcher/strikeRatio', 'Strike Ratio', 'chart_pitcher_strikeratio', '');
