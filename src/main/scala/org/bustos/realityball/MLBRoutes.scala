@@ -38,13 +38,20 @@ trait MLBRoutes extends HttpService {
         }
       } ~
       pathPrefix("team") {
-        path("fantasy") {
-          parameters('team, 'year) { (team, year) =>
+        path("injuries") {
+          parameters('team) { (team) =>
             respondWithMediaType(`application/json`) {
-              complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, year), List("Total", "25 Day")))
+              complete(realityballData.injuries(team).toJson.toString)
             }
           }
         } ~
+          path("fantasy") {
+            parameters('team, 'year) { (team, year) =>
+              respondWithMediaType(`application/json`) {
+                complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, year), List("Total", "25 Day")))
+              }
+            }
+          } ~
           path("ballparkBA") {
             parameters('team, 'year) { (team, year) =>
               respondWithMediaType(`application/json`) {

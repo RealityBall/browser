@@ -44,6 +44,7 @@ $(document).ready(function(){
 		$('#selectedPlayerText').text('Players');
 		$('#teamSelectStatus').removeClass('hide');
 		$('#schedule').removeClass('hide');
+		$('#injuries').removeClass('hide');
 		$('#playerSummary').html('');
 		selectedTeam = this.id;
 		batterCharts.map(hideChart);
@@ -71,11 +72,22 @@ $(document).ready(function(){
 			cache: false
 		}).done (function (schedule) {
 			$('tbody#schedule_table_body').empty();
-			$.each(schedule, function(key, game) {
+			$.each(schedule, function(key, fullGameInfo) {
 				var temp = '';
+				var game = fullGameInfo.schedule;
+				var odds = fullGameInfo.odds;
 				if (game.temp != '0') temp = game.temp;
 				var record = '';
-				if (game.homeTeam == selectedTeam) record = game.record;
+				var homeML;
+				var visitorML;
+				if (game.homeTeam == selectedTeam) {
+					record = game.record;
+					homeML = odds.homeML;
+					visitorML = odds.visitorML;
+				} else {
+					homeML = odds.visitorML;
+					visitorML = odds.homeML;
+				}
 				$('#schedule_table_body').append('<tr>' + 
 					'<td>' + game.date + '</td>' +
 					'<td>' + game.visitingTeam + '</td>' +
@@ -84,11 +96,29 @@ $(document).ready(function(){
 					'<td>' + record + '</td>' +
 					'<td>' + game.winningPitcher + '</td>' +
 					'<td>' + game.losingPitcher + '</td>' +
+					'<td align=\'right\'>' + visitorML + '</td>' +
+					'<td align=\'right\'>' + homeML + '</td>' +
 					'<td>' + game.startTime + '</td>' +
 					'<td>' + temp + '</td>' +
 					'<td>' + game.sky + '</td>' +
 					'</tr>'
 					);
+			});
+		});
+		$.ajax({
+			url: '/team/injuries?team=' + selectedTeam,
+			cache: false
+		}).done (function (schedule) {
+			$('tbody#injuries_table_body').empty();
+			$.each(schedule, function(key, injury) {
+				$('#injuries_table_body').append('<tr>' + 
+					'<td>' + injury.injuryReportDate + '</td>' +
+					'<td>' + injury.mlbId + '</td>' +
+					'<td>' + injury.status + '</td>' +
+					'<td>' + injury.dueBack + '</td>' +
+					'<td>' + injury.injury + '</td>' +
+					'</tr>'
+				);
 			});
 		});
 		loadingTeamGraphs = 4;
@@ -205,6 +235,7 @@ $(document).ready(function(){
 	function handlePlayerSelect() {
 		$('#selectedPlayerText').text(this.innerText);
 		$('#schedule').addClass('hide');
+		$('#injuries').addClass('hide');
 		selectedPlayer = this.id;
 		if ($('#selectedPlayerText').text().indexOf('(P)') == -1) {
 		  $('#playerSelectStatus').removeClass('hide');

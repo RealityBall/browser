@@ -30,8 +30,9 @@ libraryDependencies ++= {
     "log4j"               %   "log4j"         % "1.2.14",
     "org.slf4j"           %   "slf4j-api"     % "1.7.6",
     "org.slf4j"           %   "slf4j-simple"  % "1.7.6",
-    "mysql"               % "mysql-connector-java" % "latest.release"
-  )
+    "mysql"               % "mysql-connector-java" % "latest.release",
+    "joda-time"           % "joda-time"       % "2.7",
+    "org.joda"            % "joda-convert"    % "1.2")
 }
 
 Revolver.settings

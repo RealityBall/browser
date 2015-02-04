@@ -104,28 +104,49 @@
 	   <div class="col-md-6" id="chart_ballpark_temp" style="width: 900px; height: 500px;"></div>
 	   <div class="col-md-6" id="chart_ballpark_attendance" style="width: 900px; height: 500px;"></div>
 	</div>
-	<div class="container" id="schedule">
-		<h3>Schedule</h3>
-		<table class="table">
-		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Visitor</th>
-				<th>Home</th>
-				<th>Result</th>
-				<th>Record</th>
-				<th>Winning Pitcher</th>
-				<th>Losing Pitcher</th>
-				<th>Time</th>
-				<th>Temp</th>
-				<th>Conditions</th>
-			</tr>
-		</thead>
-		<tbody id="schedule_table_body">
-		</tbody>
+	<div class="container"> 
+		<div id="injuries">
+			<h3>Injuries</h3>
+			<table class="table">
+			<thead>
+				<tr>
+					<th>Report Date</th>
+					<th>Name</th>
+					<th>Status</th>
+					<th>Due Back</th>
+					<th>Injury</th>
+				</tr>
+			</thead>
+			<tbody id="injuries_table_body">
+			</tbody>
+			</table>
+		</div>
+		<div id="schedule">
+			<h3>Schedule</h3>
+			<table class="table">
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Visitor</th>
+					<th>Home</th>
+					<th>Result</th>
+					<th>Record</th>
+					<th>Winning Pitcher</th>
+					<th>Losing Pitcher</th>
+					<th>Visiting ML</th>
+					<th>Home ML</th>
+					<th>Time</th>
+					<th>Temp</th>
+					<th>Conditions</th>
+				</tr>
+			</thead>
+			<tbody id="schedule_table_body">
+			</tbody>
+			</table>
+		</div>
 	</div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./graph.js"></script>
