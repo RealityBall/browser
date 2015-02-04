@@ -111,6 +111,7 @@ $(document).ready(function(){
 		}).done (function (schedule) {
 			$('tbody#injuries_table_body').empty();
 			$.each(schedule, function(key, injury) {
+				$('#injuryReportTime').html("&nbsp(as of: " + injury.reportTime + ")");
 				$('#injuries_table_body').append('<tr>' + 
 					'<td>' + injury.injuryReportDate + '</td>' +
 					'<td>' + injury.mlbId + '</td>' +
@@ -207,13 +208,17 @@ $(document).ready(function(){
 		  	if (data.appearances.espnId.length > 0) externalLinks = externalLinks.concat('<a href=\'http://espn.go.com/mlb/player/_/id/' + data.appearances.espnId + '\' target=\'_blank\'><strong>&nbsp;&nbsp;&nbsp;espn.com</strong></a>');
 		  	if (data.appearances.brefId.length > 0) externalLinks = externalLinks.concat('<a href=\'http://www.baseball-reference.com/players/' + data.appearances.brefId[0] + '/' + data.appearances.brefId + '.shtml\' target=\'_blank\'><strong>&nbsp;&nbsp;bref.com</strong></a>');
 		  	if (isBatter) {
-			  	$('#playerSummary').html('<b>Bats:</b> ' + data.meta.batsWith + ', <b>Throws:</b> ' + data.meta.throwsWith + ', <b>RH At Bats:</b> ' + 
-			  							 data.appearances.RHatBats + ', <b>LH At Bats:</b> ' + data.appearances.LHatBats + ', <b>Games:</b> ' + data.appearances.games +
-			  							 externalLinks);
+		  		var lineupRegime = data.appearances.lineupRegime;
+		  		if (lineupRegime == 0) lineupRegime = '(UNK)'
+			  	$('#playerSummary').html('<b>Bats:</b>&nbsp' + data.meta.batsWith + ',&nbsp<b>Throws:</b>&nbsp' + data.meta.throwsWith + 
+			  		',&nbsp<b>RH At Bats:</b>&nbsp' + data.appearances.RHatBats + ',&nbsp<b>LH At Bats:</b>&nbsp' + data.appearances.LHatBats + 
+			  		',&nbsp<b>Games:</b>&nbsp' + data.appearances.games + ',&nbsp<b>Lineup Regime:</b>&nbsp' + lineupRegime +
+			  		externalLinks);
 			} else {
-			  	$('#playerSummary').html('<b>Bats:</b> ' + data.meta.batsWith + ', <b>Throws:</b> ' + data.meta.throwsWith + ', <b>Wins:</b> ' + 
-			  							 data.appearances.wins + ', <b>Losses:</b> ' + data.appearances.losses + ', <b>Saves:</b> ' + data.appearances.saves +
-			  							 externalLinks);
+			  	$('#playerSummary').html('<b>Bats:</b>&nbsp' + data.meta.batsWith + ',&nbsp<b>Throws:</b>&nbsp' + data.meta.throwsWith + 
+			  		',&nbsp<b>Wins:</b>&nbsp' + data.appearances.wins + ',&nbsp<b>Losses:</b>&nbsp' + data.appearances.losses + 
+			  		',&nbsp<b>Saves:</b>&nbsp' + data.appearances.saves + ',&nbsp<b>Avg Days Between:</b>&nbsp' + data.appearances.daysSinceLastApp +
+			  		externalLinks);
 			}
 		  },
 		  error: function (xhr, textStatus, errorThrown) {
