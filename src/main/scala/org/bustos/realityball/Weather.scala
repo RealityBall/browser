@@ -79,7 +79,7 @@ class Weather(postalCode: String) {
     val format = new java.text.SimpleDateFormat("yyyyMMdd HH:mm")
     val date = format.parse(time)
     hourlyForecasts.reverse.find { _.FCTTIME.epoch.toLong < date.getTime } match {
-      case Some(x) => GameConditions("", "", "", false, x.temp.english.toInt, "", x.wspd.english.toInt, "", "", x.condition)
+      case Some(x) => GameConditions("", "", "", false, x.temp.english.toInt, "", x.wspd.english.toInt, "", x.pop, x.condition)
       case None    => null
     }
   }

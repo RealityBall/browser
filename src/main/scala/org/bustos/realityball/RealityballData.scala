@@ -472,17 +472,17 @@ class RealityballData {
     }
   }
 
-  def ballparkTemp(team: String, year: String): List[(String, Double)] = {
+  def ballparkTemp(team: String, year: String): List[(String, Double, Double)] = {
     db.withSession { implicit session =>
       val teamMeta = teamsTable.filter({ x => x.year === "2014" && x.mnemonic === team }).list
-      if (teamMeta.isEmpty) List.empty[(String, Double)]
+      if (teamMeta.isEmpty) List.empty[(String, Double, Double)]
       else {
         val weather = new Weather(teamMeta.head.zipCode)
-        val formatter = DateTimeFormat.forPattern("MM/dd H:mm a")
+        val formatter = DateTimeFormat.forPattern("M/d h:mm a")
         weather.hourlyForecasts.map({ x =>
           {
             val date = new DateTime(x.FCTTIME.epoch.toLong * 1000)
-            (formatter.print(date), x.temp.english.toDouble)
+            (formatter.print(date), x.temp.english.toDouble, x.pop.toDouble)
           }
         })
       }

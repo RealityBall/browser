@@ -9,7 +9,7 @@ $(document).ready(function(){
 					    'chart_draftkings_fantasy', 'chart_draftkings_fantasy_moving', 'chart_draftster_fantasy', 'chart_draftster_fantasy_moving'];
 	var pitcherCharts = ['chart_pitcher_outs', 'chart_pitcher_style', 'chart_pitcher_strikeratio', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
 					    'chart_draftkings_fantasy', 'chart_draftkings_fantasy_moving', 'chart_draftster_fantasy', 'chart_draftster_fantasy_moving'];
-	var teamCharts = ['chart_team_fantasy', 'chart_ballpark_ba', 'chart_ballpark_temp', 'chart_ballpark_attendance'];
+	var teamCharts = ['chart_team_fantasy', 'chart_ballpark_ba', 'chart_ballpark_conditions', 'chart_ballpark_attendance'];
   	$.ajax({
 		url: '/years',
 		cache: false
@@ -125,7 +125,7 @@ $(document).ready(function(){
 		loadingTeamGraphs = 4;
 		getDataAndDrawChart('/team/fantasy?' + parameters, 'Total Fantasy Score', 'chart_team_fantasy', '');
 		getDataAndDrawChart('/team/ballparkBA?' + parameters, '25 Day Ballpark Batting Average', 'chart_ballpark_ba', '');
-		getDataAndDrawChart('/team/ballparkTemp?' + parameters, 'Ballpark Temp Forecast', 'chart_ballpark_temp', '');
+		getDataAndDrawChart('/team/ballparkConditions?' + parameters, 'Ballpark Conditions Forecast', 'chart_ballpark_conditions', '');
 		getDataAndDrawChart('/team/ballparkAttendance?' + parameters, 'Ballpark Attendance', 'chart_ballpark_attendance', '');
 	};
 	function getDataAndDrawChart(url, title, chartName) {
@@ -161,7 +161,7 @@ $(document).ready(function(){
 					vAxis: {maxValue: 0.5, minValue: 0, gridlines: {count: 6}}
  				};
 				var chart = new google.visualization.LineChart(document.getElementById(chartName));
-			} else if (title == 'Ballpark Temp Forecast') {
+			} else if (title == 'Ballpark Conditions Forecast') {
 				var options = {
 					title: title,
 					vAxis: {maxValue: 100, minValue: 0},

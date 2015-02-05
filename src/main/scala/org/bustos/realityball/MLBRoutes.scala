@@ -66,10 +66,10 @@ trait MLBRoutes extends HttpService {
               }
             }
           } ~
-          path("ballparkTemp") {
+          path("ballparkConditions") {
             parameters('team, 'year) { (team, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable(realityballData.ballparkTemp(team, year), "Temp (F)"))
+                complete(realityballData.dataNumericTable2(realityballData.ballparkTemp(team, year), List("Temp (F)", "Precip (%)")))
               }
             }
           } ~
