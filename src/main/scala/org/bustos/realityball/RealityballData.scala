@@ -494,14 +494,10 @@ class RealityballData {
       val formatter = DateTimeFormat.forPattern("yyyyMMdd")
       val lookingOut = formatter.print((new DateTime).plusMonths(3))
       val schedule = {
-        if (year == "All") gamedayScheduleTable.filter({ x => ((x.homeTeam === team) || (x.visitingTeam === team)) && x.date < lookingOut }).sortBy(_.date).list
-        else gamedayScheduleTable.filter({ x => ((x.homeTeam === team) || (x.visitingTeam === team)) && x.date < lookingOut }).sortBy(_.date).list
+        if (year == "All") (gamedayScheduleTable join gameOddsTable on (_.id === _.id)).filter({ x => ((x._1.homeTeam === team) || (x._1.visitingTeam === team)) && x._1.date < lookingOut }).sortBy(_._1.date)
+        else (gamedayScheduleTable join gameOddsTable on (_.id === _.id)).filter({ x => ((x._1.homeTeam === team) || (x._1.visitingTeam === team)) && x._1.date < lookingOut }).sortBy(_._1.date)
       }
-      schedule.reverse.map { x =>
-        val oddsForGame = gameOddsTable.filter({ y => y.id === x.id }).list
-        if (oddsForGame.isEmpty) FullGameInfo(x, GameOdds("", 0, 0, 0.0, 0))
-        else FullGameInfo(x, oddsForGame.head)
-      }
+      schedule.list.reverse.map { case (x, y) => FullGameInfo(x, y) }
     }
   }
 
