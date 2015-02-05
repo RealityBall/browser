@@ -69,7 +69,7 @@ trait MLBRoutes extends HttpService {
           path("ballparkConditions") {
             parameters('team, 'year) { (team, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable2(realityballData.ballparkTemp(team, year), List("Temp (F)", "Precip (%)")))
+                complete(realityballData.dataNumericTable2(realityballData.ballparkConditions(team, year), List("Temp (F)", "Precip (%)")))
               }
             }
           } ~
