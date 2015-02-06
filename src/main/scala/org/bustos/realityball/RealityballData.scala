@@ -341,7 +341,7 @@ class RealityballData {
                 sum(RHgroundBall + LHgroundBall) as ground,
                 sum(RHbaseOnBalls + LHbaseOnBalls + RHhitByPitch + LHhitByPitch) as baseOnBalls
               from
-              	hitterRawLHStats a, hitterRawRHStats b
+              	hitterRawLHstats a, hitterRawRHstats b
               where
               	a.id = ? and a.id = b.id and a.gameId = b.gameId
             """
@@ -355,7 +355,7 @@ class RealityballData {
                 sum(RHgroundBall + LHgroundBall) as ground,
                 sum(RHbaseOnBalls + LHbaseOnBalls + RHhitByPitch + LHhitByPitch) as baseOnBalls
               from
-              	hitterRawLHStats a, hitterRawRHStats b
+              	hitterRawLHstats a, hitterRawRHstats b
               where
               	a.id = ? and a.id = b.id and a.gameId = b.gameId and instr(a.date, ?) > 0
               """
