@@ -216,6 +216,13 @@ trait MLBRoutes extends HttpService {
                 complete(realityballData.dataTable(realityballData.onBaseVolatility(player, year)))
               }
             }
+          } ~
+          path("style") {
+            parameters('player, 'year) { (player, year) =>
+              respondWithMediaType(`application/json`) {
+                complete(realityballData.dataNumericPieChart(realityballData.batterStyleCounts(player, year), "Type", "At Bat Result"))
+              }
+            }
           }
       } ~
       path("graph") {

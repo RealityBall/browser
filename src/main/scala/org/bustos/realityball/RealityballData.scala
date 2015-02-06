@@ -51,12 +51,18 @@ class RealityballData {
     }
   }
 
-  def playerFromName(firstName: String, lastName: String, year: String): Player = {
+  def playerFromName(firstName: String, lastName: String, year: String, team: String): Player = {
     db.withSession { implicit session =>
       val playerList = playersTable.filter({ x => x.firstName.like(firstName + "%") && x.lastName === lastName && x.year === year }).list
       if (playerList.isEmpty) throw new IllegalStateException("No one found by the name of: " + firstName + " " + lastName)
-      else if (playerList.length > 1) throw new IllegalStateException("Non Unique Name: " + firstName + " " + lastName)
-      else playerList.head
+      else if (playerList.length > 1) {
+        if (team != "") {
+          val teamPlayerList = playersTable.filter({ x => x.firstName.like(firstName + "%") && x.lastName === lastName && x.year === year && x.team === team }).list
+          if (teamPlayerList.isEmpty) throw new IllegalStateException("No one found by the name of: " + firstName + " " + lastName)
+          else if (teamPlayerList.length > 1) throw new IllegalStateException("Non Unique Name: " + firstName + " " + lastName)
+          else teamPlayerList.head
+        } else throw new IllegalStateException("Non Unique Name: " + firstName + " " + lastName)
+      } else playerList.head
     }
   }
 
@@ -322,6 +328,40 @@ class RealityballData {
     db.withSession { implicit session =>
       val playerStats = hitterVolatilityStatsQuery(id, year).sortBy(_.date).map(p => (p.date, p.onBaseVolatility, p.LHonBaseVolatility, p.RHonBaseVolatility)).list
       playerStats.map({ x => BattingAverageObservation(x._1, displayDouble(x._2), displayDouble(x._3), displayDouble(x._4)) })
+    }
+  }
+
+  def batterStyleCounts(id: String, year: String): List[(String, Double)] = {
+    db.withSession { implicit session =>
+      if (year == "All") {
+        val q = Q[String, (Double, Double, Double, Double)] + """
+              select
+                sum(RHstrikeOut + LHstrikeOut) as souts,
+                sum(RHflyBall + LHflyBall) as fly,
+                sum(RHgroundBall + LHgroundBall) as ground,
+                sum(RHbaseOnBalls + LHbaseOnBalls + RHhitByPitch + LHhitByPitch) as baseOnBalls
+              from
+              	hitterRawLHStats a, hitterRawRHStats b
+              where
+              	a.id = ? and a.id = b.id and a.gameId = b.gameId
+            """
+        val result = q(id).first
+        List(("Strikeouts", result._1), ("Flyball", result._2), ("Groundball", result._3), ("Base On Balls", result._4))
+      } else {
+        val q = Q[(String, String), (Double, Double, Double, Double)] + """
+              select
+                sum(RHstrikeOut + LHstrikeOut) as souts,
+                sum(RHflyBall + LHflyBall) as fly,
+                sum(RHgroundBall + LHgroundBall) as ground,
+                sum(RHbaseOnBalls + LHbaseOnBalls + RHhitByPitch + LHhitByPitch) as baseOnBalls
+              from
+              	hitterRawLHStats a, hitterRawRHStats b
+              where
+              	a.id = ? and a.id = b.id and a.gameId = b.gameId and instr(a.date, ?) > 0
+              """
+        val result = q(id, year).first
+        List(("Strikeouts", result._1), ("Flyball", result._2), ("Groundball", result._3), ("Base On Balls", result._4))
+      }
     }
   }
 

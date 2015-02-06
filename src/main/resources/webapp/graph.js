@@ -3,7 +3,7 @@ $(document).ready(function(){
 	var loadingTeamGraphs = 0;
 	var selectedPlayer = '';
 	var selectedTeam = '';
-	var batterCharts = ['chart_ba', 'chart_ba_moving', 'chart_ba_volatility', 'chart_ba_daily', 'chart_slg',
+	var batterCharts = ['chart_ba', 'chart_ba_moving', 'chart_ba_volatility', 'chart_batter_style', 'chart_slg',
 					    'chart_obp', 'chart_slg_moving', 'chart_obp_moving', 'chart_slg_volatility',
 					    'chart_obp_volatility', 'chart_fanduel_fantasy', 'chart_fanduel_fantasy_moving',
 					    'chart_draftkings_fantasy', 'chart_draftkings_fantasy_moving', 'chart_draftster_fantasy', 'chart_draftster_fantasy_moving'];
@@ -149,6 +149,12 @@ $(document).ready(function(){
 					legend: 'none'
 				};
 				var chart = new google.visualization.PieChart(document.getElementById(chartName));
+			} else if (title == 'Style') {
+				var options = {
+					title: title,
+					isStacked: true
+				};
+				var chart = new google.visualization.PieChart(document.getElementById(chartName));
 			} else if (title == 'Ballpark Attendance') {
 				var options = {
 					title: title,
@@ -250,7 +256,7 @@ $(document).ready(function(){
 		  drawPlayerChart(this.id, '/batter/BA', 'As of Date Batting Average', 'chart_ba', '');
 		  drawPlayerChart(this.id, '/batter/movingBA', '25 Day Batting Averages', 'chart_ba_moving', '');
 		  drawPlayerChart(this.id, '/batter/volatilityBA', '100 Day Batting Average Volatility', 'chart_ba_volatility', '');
-		  drawPlayerChart(this.id, '/batter/dailyBA', 'Daily Batting Average', 'chart_ba_daily', '');
+		  drawPlayerChart(this.id, '/batter/style', 'Style', 'chart_batter_style', '');
 		  drawPlayerChart(this.id, '/batter/slugging', 'Slugging percentage', 'chart_slg', '');
 		  drawPlayerChart(this.id, '/batter/onBase', 'On base percentage', 'chart_obp', '');
 		  drawPlayerChart(this.id, '/batter/sluggingMoving', '25 Day Slugging percentage', 'chart_slg_moving', '');
