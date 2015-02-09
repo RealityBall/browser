@@ -24,6 +24,18 @@ class RealityballData {
     }
   }
 
+  def mlbComIdFromRetrosheet(team: String): String = {
+    db.withSession { implicit session =>
+      teamsTable.filter(_.mnemonic === team).map(_.mlbComId).list.head
+    }
+  }
+
+  def games(date: DateTime): List[Game] = {
+    db.withSession { implicit session =>
+      gamesTable.filter({ x => x.date === CcyymmddSlashDelimFormatter.print(date) }).list
+    }
+  }
+
   def playerFromRetrosheetId(retrosheetId: String, year: String): Player = {
     db.withSession { implicit session =>
       val playerList = {
