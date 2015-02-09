@@ -139,49 +139,81 @@ $(document).ready(function(){
 				var options = {
 					title: title,
 					isStacked: true,
-					legend: { position: 'bottom' }
+					legend: { position: 'bottom' },
+					animation:{
+						duration: 1000,
+						easing: 'out'
+					}
  				};
 				var chart = new google.visualization.SteppedAreaChart(document.getElementById(chartName));
 			} else if (title == 'Outs Types') {
 				var options = {
 					title: title,
 					isStacked: true,
-					legend: 'none'
+					legend: 'none',
+					animation:{
+						duration: 1000,
+						easing: 'out'
+					}
 				};
 				var chart = new google.visualization.PieChart(document.getElementById(chartName));
 			} else if (title == 'Style') {
 				var options = {
 					title: title,
-					isStacked: true
+					isStacked: true,
+					animation:{
+						duration: 1000,
+						easing: 'out'
+					}
 				};
 				var chart = new google.visualization.PieChart(document.getElementById(chartName));
 			} else if (title == 'Ballpark Attendance') {
 				var options = {
 					title: title,
-					vAxis: {maxValue: 50000, minValue: 0, gridlines: {count: 6}}
+					vAxis: {maxValue: 50000, minValue: 0, gridlines: {count: 6}},
+					animation:{
+						duration: 1000,
+						easing: 'out'
+					}
  				};
 				var chart = new google.visualization.LineChart(document.getElementById(chartName));
 			} else if (title == '25 Day Ballpark Batting Average') {
 				var options = {
 					title: title,
-					vAxis: {maxValue: 0.5, minValue: 0, gridlines: {count: 6}}
+					vAxis: {maxValue: 0.5, minValue: 0, gridlines: {count: 6}},
+					animation:{
+						duration: 1000,
+						easing: 'out'
+					}
  				};
 				var chart = new google.visualization.LineChart(document.getElementById(chartName));
 			} else if (title == 'Ballpark Conditions Forecast') {
 				var options = {
 					title: title,
 					vAxis: {maxValue: 100, minValue: 0},
+					animation: {
+						duration: 1000,
+						easing: 'out'
+					}
  				};
 				var chart = new google.visualization.LineChart(document.getElementById(chartName));
 			} else if (title == 'Total Fantasy Score') {
 				var options = {
 					title: title,
-					vAxis: {maxValue: 100, minValue: 0}
+					vAxis: {maxValue: 100, minValue: 0},
+					animation:{
+						duration: 1000,
+						easing: 'out'
+					}
  				};
 				var chart = new google.visualization.LineChart(document.getElementById(chartName));
 			} else {
 				var options = {
-					title: title
+					title: title,
+					animation:{
+						duration: 1000,
+						easing: 'out'
+					}
 				};
 				var chart = new google.visualization.LineChart(document.getElementById(chartName));
 			}
