@@ -36,6 +36,65 @@ class RealityballData {
     }
   }
 
+  def startingBatters(game: Game, side: Int, year: String): List[Player] = {
+    db.withSession { implicit session =>
+      val query = for {
+        hitters <- hitterStats if (hitters.gameId === game.id && hitters.lineupPosition > 0)
+        players <- playersTable if (players.id === hitters.id)
+      } yield (players, hitters)
+      query.filter({ x => x._1.year === year && x._2.side === side }).sortBy({ x => x._2.lineupPosition }).map({ x => x._1 }).list
+    }
+  }
+
+  def latestLineupRegime(game: Game, player: Player): Int = {
+    db.withSession { implicit session =>
+      hitterStats.filter({ x => x.id === player.id && x.date < game.date }).sortBy({ _.date.desc }).map({ _.lineupPositionRegime }).list.head
+    }
+  }
+
+  def latestFantasyData(game: Game, player: Player): HitterFantasyMoving = {
+    db.withSession { implicit session =>
+      hitterFantasyMoving.filter({ x => x.id === player.id && x.date < game.date }).sortBy({ _.date.desc }).list.head
+    }
+  }
+
+  def latestBAdata(game: Game, player: Player): HitterStatsMoving = {
+    db.withSession { implicit session =>
+      hitterMovingStats.filter({ x => x.id === player.id && x.date < game.date }).sortBy({ _.date.desc }).list.head
+    }
+  }
+
+  def latestBAtrends(game: Game, player: Player, pitcher: Player): Double = {
+
+    def slope(moving: List[HitterStatsMoving]): Double = {
+      if (moving.length < 10) 0.0
+      else {
+        val observations = moving.foldLeft(List.empty[(Double, Double)])({ (x, y) =>
+          {
+            val independent = {
+              if (pitcher.throwsWith == "R") {
+                (y.LHbattingAverageMov.getOrElse(0.0) + y.LHonBasePercentageMov.getOrElse(0.0) + y.LHsluggingPercentageMov.getOrElse(0.0)) / 3.0
+              } else {
+                (y.RHbattingAverageMov.getOrElse(0.0) + y.RHonBasePercentageMov.getOrElse(0.0) + y.RHsluggingPercentageMov.getOrElse(0.0)) / 3.0
+              }
+            }
+            (x.length.toDouble, independent) :: x
+          }
+        })
+        val regress: LinearRegression = new LinearRegression(observations)
+        regress.betas._2
+      }
+    }
+
+    db.withSession { implicit session =>
+      slope(hitterMovingStats.filter({ x => x.id === player.id && x.date < game.date }).sortBy({ _.date.desc }).list.take(25))
+    }
+  }
+
+  def latestBallparkBA(game: Game): Double = {
+    0.0
+  }
+
   def playerFromRetrosheetId(retrosheetId: String, year: String): Player = {
     db.withSession { implicit session =>
       val playerList = {
@@ -475,6 +534,39 @@ class RealityballData {
             """
         withMovingAverage(q(team, year, team, year).list)
       }
+    }
+  }
+
+  def ballparkBAbyDate(team: String, date: String): BattingAverageObservation = {
+    import scala.collection.mutable.Queue
+
+    def safeRatio(x: Double, y: Double): Double = {
+      if (y != 0.0) x / y
+      else Double.NaN
+      }
+
+    def replaceWithMovingAverage(list: List[BattingAverageObservation]): List[BattingAverageObservation] = {
+      var running_1 = Queue.empty[Double]
+      var running_2 = Queue.empty[Double]
+      var running_3 = Queue.empty[Double]
+
+      list.map({ x =>
+        {
+          if (!x.bAvg.isNaN) running_1.enqueue(x.bAvg)
+          if (running_1.size > 25) running_1.dequeue
+          if (!x.lhBAvg.isNaN) running_2.enqueue(x.lhBAvg)
+          if (running_2.size > 25) running_3.dequeue
+          if (!x.rhBAvg.isNaN) running_3.enqueue(x.rhBAvg)
+          if (running_3.size > 25) running_3.dequeue
+          BattingAverageObservation(x.date, running_1.foldLeft(0.0)(_ + _) / running_1.size, running_2.foldLeft(0.0)(_ + _) / running_2.size, running_3.foldLeft(0.0)(_ + _) / running_3.size)
+        }
+      })
+    }
+
+    db.withSession { implicit session =>
+      var records = ballparkDailiesTable.filter({ x => (x.id < (team + date + "0")) && (x.id like (team + "%")) }).sortBy(_.id).list.take(25)
+      var processed = records.map { x => BattingAverageObservation(x.date, safeRatio((x.LHhits + x.RHhits), (x.LHatBat + x.RHatBat)), safeRatio(x.LHhits, x.LHatBat), safeRatio(x.RHhits, x.RHatBat)) }
+      replaceWithMovingAverage(processed).reverse.head
     }
   }
 

@@ -1,4 +1,6 @@
 $(document).ready(function(){
+	var charts = new Object();
+	var chartsOptions = new Object();
 	var loadingPlayerGraphs = 0;
 	var loadingTeamGraphs = 0;
 	var selectedPlayer = '';
@@ -135,89 +137,128 @@ $(document).ready(function(){
 		  success: function (data, textStatus, xhr) {
 			// Create our data table out of JSON data loaded from server.
 			var dataTable = new google.visualization.DataTable(data);
-			if (title == 'Outs') {
-				var options = {
-					title: title,
-					isStacked: true,
-					legend: { position: 'bottom' },
-					animation:{
-						duration: 1000,
-						easing: 'out'
-					}
- 				};
-				var chart = new google.visualization.SteppedAreaChart(document.getElementById(chartName));
-			} else if (title == 'Outs Types') {
-				var options = {
-					title: title,
-					isStacked: true,
-					legend: 'none',
-					animation:{
-						duration: 1000,
-						easing: 'out'
-					}
-				};
-				var chart = new google.visualization.PieChart(document.getElementById(chartName));
-			} else if (title == 'Style') {
-				var options = {
-					title: title,
-					isStacked: true,
-					animation:{
-						duration: 1000,
-						easing: 'out'
-					}
-				};
-				var chart = new google.visualization.PieChart(document.getElementById(chartName));
-			} else if (title == 'Ballpark Attendance') {
-				var options = {
-					title: title,
-					vAxis: {maxValue: 50000, minValue: 0, gridlines: {count: 6}},
-					animation:{
-						duration: 1000,
-						easing: 'out'
-					}
- 				};
-				var chart = new google.visualization.LineChart(document.getElementById(chartName));
-			} else if (title == '25 Day Ballpark Batting Average') {
-				var options = {
-					title: title,
-					vAxis: {maxValue: 0.5, minValue: 0, gridlines: {count: 6}},
-					animation:{
-						duration: 1000,
-						easing: 'out'
-					}
- 				};
-				var chart = new google.visualization.LineChart(document.getElementById(chartName));
-			} else if (title == 'Ballpark Conditions Forecast') {
-				var options = {
-					title: title,
-					vAxis: {maxValue: 100, minValue: 0},
-					animation: {
-						duration: 1000,
-						easing: 'out'
-					}
- 				};
-				var chart = new google.visualization.LineChart(document.getElementById(chartName));
-			} else if (title == 'Total Fantasy Score') {
-				var options = {
-					title: title,
-					vAxis: {maxValue: 100, minValue: 0},
-					animation:{
-						duration: 1000,
-						easing: 'out'
-					}
- 				};
-				var chart = new google.visualization.LineChart(document.getElementById(chartName));
+			if (title in charts) {
+				var chart = charts[title];
+				chart.draw(dataTable, chartsOptions[title]);      
 			} else {
-				var options = {
-					title: title,
-					animation:{
-						duration: 1000,
-						easing: 'out'
+				var chart 
+				if (title == 'Outs') {
+					var options = {
+						title: title,
+						isStacked: true,
+						legend: { position: 'bottom' },
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.SteppedAreaChart(document.getElementById(chartName));
+				} else if (title == 'Outs Types') {
+					var options = {
+						title: title,
+						isStacked: true,
+						legend: 'none',
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.PieChart(document.getElementById(chartName));
+				} else if (title == 'Style') {
+					var options = {
+						title: title,
+						isStacked: true,
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.PieChart(document.getElementById(chartName));
+				} else if (title == 'Ballpark Attendance') {
+					var options = {
+						title: title,
+						vAxis: {maxValue: 50000, minValue: 0, gridlines: {count: 6}},
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				} else if (title == '25 Day Ballpark Batting Average') {
+					var options = {
+						title: title,
+						vAxis: {maxValue: 0.5, minValue: 0, gridlines: {count: 6}},
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				} else if (title == 'Ballpark Conditions Forecast') {
+					var options = {
+						title: title,
+						vAxis: {maxValue: 100, minValue: 0},
+						animation: {
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				} else if (title == 'Total Fantasy Score') {
+					var options = {
+						title: title,
+						vAxis: {maxValue: 100, minValue: 0},
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				} else if (title.indexOf("Volatility") > -1) {
+					var options = {
+						title: title,
+						vAxis: {maxValue: 0.8, minValue: 0, gridlines: {count: 5}},
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				} else if (title.indexOf("Moving Average") > -1) {
+					if ((title.indexOf("FanDuel") > -1) || (title.indexOf("Draftster") > -1)) {
+						var options = {
+							title: title,
+							vAxis: {maxValue: 10, minValue: 0, gridlines: {count: 6}},
+							animation:{
+								duration: 1000,
+								easing: 'out'
+							}
+						};
+					} else {
+						var options = {
+							title: title,
+							vAxis: {maxValue: 20, minValue: 0, gridlines: {count: 5}},
+							animation:{
+								duration: 1000,
+								easing: 'out'
+							}
+						};
 					}
-				};
-				var chart = new google.visualization.LineChart(document.getElementById(chartName));
+					var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				} else {
+					var options = {
+						title: title,
+						animation:{
+							duration: 1000,
+							easing: 'out'
+						}
+					};
+					var chart = new google.visualization.LineChart(document.getElementById(chartName));
+				}
+				charts[title] = chart
+				chartsOptions[title] = options
+				chart.draw(dataTable, options);      
 			}
-			chart.draw(dataTable, options);      
 			loadingPlayerGraphs--;
 			if (loadingPlayerGraphs <= 0) $('#playerSelectStatus').addClass('hide');		
 			loadingTeamGraphs--;
