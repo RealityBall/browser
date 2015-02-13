@@ -224,7 +224,7 @@ $(document).ready(function(){
 						}
 					};
 					var chart = new google.visualization.LineChart(document.getElementById(chartName));
-				} else if (title.indexOf("Moving Average") > -1) {
+				} else if (title.indexOf("Moving average") > -1) {
 					if ((title.indexOf("FanDuel") > -1) || (title.indexOf("Draftster") > -1)) {
 						var options = {
 							title: title,
