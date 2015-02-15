@@ -31,10 +31,23 @@
 	      <ul class="nav navbar-nav">
 	         <li class="dropdown">
 	            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="selectedDate">
-	               <span id="selectedDateText">Year</span>
+	               <span id="selectedDateText">Date</span>
+	 	           <span class="spinner hide" id="dateSelectStatus"><i class="fa fa-refresh fa-spin"></i></span>
 	               <b class="caret"></b>
 	            </a>
 	            <ul class="dropdown-menu" id="dateList">
+	            </ul>
+	         </li>
+	         <li class="dropdown">
+	            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="selectedPlatform">
+	               <span id="selectedPlatformText">Platform</span>
+	 	           <span class="spinner hide" id="platformSelectStatus"><i class="fa fa-refresh fa-spin"></i></span>
+	               <b class="caret"></b>
+	            </a>
+	            <ul class="dropdown-menu" id="platformList">
+	            	<li id='Fanduel'><a href='#'>Fanduel</a></li>
+	            	<li id='DraftKings'><a href='#'>Draft Kings</a></li>
+	            	<li id='Draftster'><a href='#'>Draftster</a></li>
 	            </ul>
 	         </li>
 	      </ul>
@@ -45,20 +58,21 @@
        <div class="col-md-6" id="chart_position_catcher" style="width: 900px; height: 500px;"></div>
     </div>
 	<div class="row">   
-	   <div class="col-md-6" id="chart_position_1B" style="width: 900px; height: 500px;"></div>
-       <div class="col-md-6" id="chart_position_2B" style="width: 900px; height: 500px;"></div>
+	   <div class="col-md-6" id="chart_position_1b" style="width: 900px; height: 500px;"></div>
+       <div class="col-md-6" id="chart_position_2b" style="width: 900px; height: 500px;"></div>
     </div>
 	<div class="row">   
-	   <div class="col-md-6" id="chart_position_3B" style="width: 900px; height: 500px;"></div>
-       <div class="col-md-6" id="chart_position_SS" style="width: 900px; height: 500px;"></div>
+	   <div class="col-md-6" id="chart_position_3b" style="width: 900px; height: 500px;"></div>
+       <div class="col-md-6" id="chart_position_ss" style="width: 900px; height: 500px;"></div>
     </div>
 	<div class="row">   
-	   <div class="col-md-6" id="chart_position_OF" style="width: 900px; height: 500px;"></div>
+	   <div class="col-md-6" id="chart_position_of" style="width: 900px; height: 500px;"></div>
+	   <div class="col-md-6" id="chart_position_universe" style="width: 900px; height: 500px;"></div>
     </div>
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="./graph.js"></script>
+    <script type="text/javascript" src="./expectFantasy.js"></script>
   </body>
 </html>

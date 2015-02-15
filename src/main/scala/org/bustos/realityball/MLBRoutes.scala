@@ -8,6 +8,7 @@ import spray.http._
 import MediaTypes._
 import DefaultJsonProtocol._
 import _root_.org.slf4j.{ Logger, LoggerFactory }
+import RealityballConfig._
 
 trait MLBRoutes extends HttpService {
 
@@ -37,6 +38,29 @@ trait MLBRoutes extends HttpService {
           }
         }
       } ~
+      pathPrefix("predictions") {
+        path("dates") {
+          respondWithMediaType(`application/json`) {
+            complete(realityballData.availablePredictionDates.toJson.toString)
+          }
+        } ~
+          path(IntNumber / """.*""".r ~ Slash.?) { (dateInteger, position) =>
+            val predictions = realityballData.predictions(dateInteger.toString, position, "Fanduel")
+            respondWithMediaType(`application/json`) {
+              complete(realityballData.dataNumericTable2(predictions._1, List("Predicted", "Actual"), predictions._2))
+            }
+          } ~
+          path(IntNumber / """.*""".r / """.*""".r) { (dateInteger, position, platform) =>
+            val predictions = realityballData.predictions(dateInteger.toString, position, platform)
+            respondWithMediaType(`application/json`) {
+              complete(realityballData.dataNumericTable2(predictions._1, List("Predicted", "Actual"), predictions._2))
+            }
+          } ~ {
+            respondWithMediaType(`text/html`) {
+              complete(html.expectFantasy.render("", "").toString)
+            }
+          }
+      } ~
       pathPrefix("team") {
         path("injuries") {
           parameters('team) { (team) =>
@@ -48,7 +72,7 @@ trait MLBRoutes extends HttpService {
           path("fantasy") {
             parameters('team, 'year) { (team, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, year), List("Total", "25 Day")))
+                complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, year), List("Total", TeamMovingAverageWindow.toString + " Day"), Nil))
               }
             }
           } ~
@@ -69,7 +93,7 @@ trait MLBRoutes extends HttpService {
           path("ballparkConditions") {
             parameters('team, 'year) { (team, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable2(realityballData.ballparkConditions(team, year), List("Temp (F)", "Precip (%)")))
+                complete(realityballData.dataNumericTable2(realityballData.ballparkConditions(team, year), List("Temp (F)", "Precip (%)"), Nil))
               }
             }
           } ~
@@ -92,7 +116,7 @@ trait MLBRoutes extends HttpService {
           path("outs") {
             parameters('player, 'year) { (player, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable3(realityballData.outs(player, year), List("Strike Outs", "Fly Outs", "Ground Outs")))
+                complete(realityballData.dataNumericTable3(realityballData.outs(player, year), List("Strike Outs", "Fly Outs", "Ground Outs"), Nil))
               }
             }
           } ~
