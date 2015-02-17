@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(document).ready(function ( ) {
 	var charts = new Object();
 	var chartsOptions = new Object();
 	var loadingPlayerGraphs = 0;
