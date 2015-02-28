@@ -7,14 +7,14 @@ import spray.can.server.UHttp
 import akka.pattern.{ ask, pipe }
 import akka.util.Timeout
 import scala.concurrent.duration._
-    
+
 object MlbServer extends App with MySslConfiguration {
 
   def doMain() {
 
     implicit val system = ActorSystem()
     import system.dispatcher
-    
+
     implicit val timeout = Timeout(DurationInt(5).seconds)
 
     val server = system.actorOf(WebSocketServer.props(), "websocket")
