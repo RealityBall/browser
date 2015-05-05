@@ -67,12 +67,14 @@ class Weather(postalCode: String) {
   implicit val system = ActorSystem()
   implicit val timeout: Timeout = Timeout(5 minutes)
 
-  val timeOfRequest: Long = System.currentTimeMillis / 1000
-
   val hourlyForecasts: List[HourlyForecastDetail] = {
-    val request = HttpRequest(HttpMethods.GET, WUNDERGROUND_APIURL + WUNDERGROUND_APIKEY + "/hourly/q/" + postalCode + ".json")
-    val response = Await.result((IO(Http) ? request).mapTo[HttpResponse], 30 seconds) ~> unmarshal[String]
-    response.parseJson.convertTo[HourlyForecast].hourly_forecast.toList
+    try {
+      val request = HttpRequest(HttpMethods.GET, WUNDERGROUND_APIURL + WUNDERGROUND_APIKEY + "/hourly/q/" + postalCode + ".json")
+      val response = Await.result((IO(Http) ? request).mapTo[HttpResponse], 30 seconds) ~> unmarshal[String]
+      response.parseJson.convertTo[HourlyForecast].hourly_forecast.toList
+    } catch {
+      case e: Exception => List.empty[HourlyForecastDetail]
+    }
   }
 
   def forecastConditions(time: String): GameConditions = {

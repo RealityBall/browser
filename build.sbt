@@ -6,6 +6,8 @@ version := "1.0"
 
 scalaVersion := "2.11.2"
 
+offline := true
+
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 resolvers += "Spray" at "http://repo.spray.io"
