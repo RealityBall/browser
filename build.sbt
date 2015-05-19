@@ -27,6 +27,8 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV   % "test",
     "com.typesafe.slick"  %%  "slick" % "2.1.0",
+    "org.seleniumhq.selenium" % "selenium-java" % "2.35.0",
+    "org.scalatest"      %% "scalatest" % "2.1.6",
     "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test",
     "com.wandoulabs.akka" %% "spray-websocket" % "0.1.3",
     "log4j"               %   "log4j"         % "1.2.14",

@@ -217,7 +217,7 @@ $(document).ready(function ( ) {
 				} else if (title.indexOf("Volatility") > -1) {
 					var options = {
 						title: title,
-						vAxis: {maxValue: 0.8, minValue: 0, gridlines: {count: 5}},
+						vAxis: {maxValue: 0.3, minValue: 0, gridlines: {count: 5}},
 						animation:{
 							duration: 1000,
 							easing: 'out'
@@ -328,14 +328,14 @@ $(document).ready(function ( ) {
 		  batterCharts.map(showChart);
 		  drawPlayerChart(this.id, '/batter/BA', 'As of Date Batting Average', 'chart_ba', '');
 		  drawPlayerChart(this.id, '/batter/movingBA', '25 Day Batting Averages', 'chart_ba_moving', '');
-		  drawPlayerChart(this.id, '/batter/volatilityBA', '100 Day Batting Average Volatility', 'chart_ba_volatility', '');
+		  drawPlayerChart(this.id, '/batter/volatilityBA', '50 Day Batting Average Volatility', 'chart_ba_volatility', '');
 		  drawPlayerChart(this.id, '/batter/style', 'Style', 'chart_batter_style', '');
 		  drawPlayerChart(this.id, '/batter/slugging', 'Slugging percentage', 'chart_slg', '');
 		  drawPlayerChart(this.id, '/batter/onBase', 'On base percentage', 'chart_obp', '');
 		  drawPlayerChart(this.id, '/batter/sluggingMoving', '25 Day Slugging percentage', 'chart_slg_moving', '');
 		  drawPlayerChart(this.id, '/batter/onBaseMoving', '25 Day On base percentage', 'chart_obp_moving', '');
-		  drawPlayerChart(this.id, '/batter/sluggingVolatility', '100 Day Slugging Volatility', 'chart_slg_volatility', '');
-		  drawPlayerChart(this.id, '/batter/onBaseVolatility', '100 Day On base Volatility', 'chart_obp_volatility', '');
+		  drawPlayerChart(this.id, '/batter/sluggingVolatility', '50 Day Slugging Volatility', 'chart_slg_volatility', '');
+		  drawPlayerChart(this.id, '/batter/onBaseVolatility', '50 Day On base Volatility', 'chart_obp_volatility', '');
 		  drawPlayerChart(this.id, '/batter/fantasy', 'Daily FanDuel score', 'chart_fanduel_fantasy', 'FanDuel');
 		  drawPlayerChart(this.id, '/batter/fantasyMoving', 'Moving average FanDuel score', 'chart_fanduel_fantasy_moving', 'FanDuel');
 		  drawPlayerChart(this.id, '/batter/fantasy', 'Daily DraftKings score', 'chart_draftkings_fantasy', 'DraftKings');
