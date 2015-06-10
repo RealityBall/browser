@@ -7,12 +7,13 @@ import spray.json._
 import spray.http._
 import MediaTypes._
 import DefaultJsonProtocol._
-import _root_.org.slf4j.{ Logger, LoggerFactory }
-import RealityballConfig._
+import org.slf4j.{ Logger, LoggerFactory }
+import org.bustos.realityball.common.RealityballConfig._
+import org.bustos.realityball.common.RealityballData
 
 trait MLBRoutes extends HttpService {
 
-  import RealityballJsonProtocol._
+  import org.bustos.realityball.common.RealityballJsonProtocol._
 
   val realityballData = new RealityballData
   val logger = LoggerFactory.getLogger(getClass)

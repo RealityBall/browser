@@ -1,42 +1,45 @@
 import com.typesafe.sbt.SbtStartScript
 
-name := "browser"
+lazy val commonSettings = Seq(
+   organization := "org.bustos",
+   version := "0.1.0",
+   scalaVersion := "2.11.4"
+)
 
-version := "1.0"
+lazy val commons = ProjectRef(file("../common"), "common")
 
-scalaVersion := "2.11.2"
-
-offline := true
+lazy val browser = (project in file("."))
+    .settings(name := "browser")
+    .settings(commonSettings: _*)
+    .settings(libraryDependencies ++= projectLibraries)
+    .settings(resolvers += "Spray" at "http://repo.spray.io")
+    .dependsOn(commons)
+    .enablePlugins(SbtTwirl)
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
-resolvers += "Spray" at "http://repo.spray.io"
+val slf4jV = "1.7.6"
+val sprayV = "1.3.2"
+val akkaV = "2.3.6"
 
-lazy val root = (project in file(".")).enablePlugins(SbtTwirl)
-
-seq(SbtStartScript.startScriptForClassesSettings: _*)
-
-libraryDependencies ++= {
-  val sprayV = "1.3.2"
-  val akkaV = "2.3.6"
-  Seq(
-    "io.spray"            %%  "spray-can"     % sprayV,
-    "io.spray"            %%  "spray-routing" % sprayV,
-    "io.spray"            %%  "spray-testkit" % sprayV  % "test",
-    "io.spray"            %%  "spray-json"    % "1.3.1",
-    "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
-    "com.typesafe.akka"   %%  "akka-testkit"  % akkaV   % "test",
-    "com.typesafe.slick"  %%  "slick" % "2.1.0",
-    "org.seleniumhq.selenium" % "selenium-java" % "2.35.0",
-    "org.scalatest"      %% "scalatest" % "2.1.6",
-    "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test",
-    "com.wandoulabs.akka" %% "spray-websocket" % "0.1.3",
-    "log4j"               %   "log4j"         % "1.2.14",
-    "org.slf4j"           %   "slf4j-api"     % "1.7.6",
-    "org.slf4j"           %   "slf4j-simple"  % "1.7.6",
-    "mysql"               % "mysql-connector-java" % "latest.release",
-    "joda-time"           % "joda-time"       % "2.7",
-    "org.joda"            % "joda-convert"    % "1.2")
-}
+val projectLibraries = Seq(
+    "io.spray"                %% "spray-can"       % sprayV,
+    "io.spray"                %% "spray-routing"   % sprayV,
+    "io.spray"                %% "spray-testkit"   % sprayV  % "test",
+    "io.spray"                %% "spray-json"      % "1.3.1",
+    "com.typesafe.akka"       %% "akka-actor"      % akkaV,
+    "com.typesafe.akka"       %% "akka-testkit"    % akkaV   % "test",
+    "com.typesafe.slick"      %% "slick"           % "2.1.0",
+    "org.seleniumhq.selenium" %  "selenium-java"   % "2.35.0",
+    "org.scalatest"           %% "scalatest"       % "2.1.6",
+    "org.specs2"              %% "specs2-core"     % "2.3.11" % "test",
+    "com.wandoulabs.akka"     %% "spray-websocket" % "0.1.3",
+    "log4j"                   %  "log4j"           % "1.2.14",
+    "org.slf4j"               %  "slf4j-api"       % slf4jV,
+    "org.slf4j"               %  "slf4j-simple"    % slf4jV,
+    "mysql"                   %  "mysql-connector-java" % "latest.release",
+    "joda-time"               %  "joda-time"       % "2.7",
+    "org.joda"                %  "joda-convert"    % "1.2"
+)
 
 Revolver.settings
