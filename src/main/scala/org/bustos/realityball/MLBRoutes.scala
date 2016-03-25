@@ -46,13 +46,13 @@ trait MLBRoutes extends HttpService {
           }
         } ~
           path(IntNumber / """.*""".r ~ Slash.?) { (dateInteger, position) =>
-            val predictions = realityballData.predictions(dateInteger.toString, position, "Fanduel")
+            val predictions = realityballData.predictions(CcyymmddFormatter.parseDateTime(dateInteger.toString), position, "Fanduel")
             respondWithMediaType(`application/json`) {
               complete(realityballData.dataNumericTable2(predictions._1, List("Predicted", "Actual"), predictions._2))
             }
           } ~
           path(IntNumber / """.*""".r / """.*""".r) { (dateInteger, position, platform) =>
-            val predictions = realityballData.predictions(dateInteger.toString, position, platform)
+            val predictions = realityballData.predictions(CcyymmddFormatter.parseDateTime(dateInteger.toString), position, platform)
             respondWithMediaType(`application/json`) {
               complete(realityballData.dataNumericTable2(predictions._1, List("Predicted", "Actual"), predictions._2))
             }
@@ -73,7 +73,7 @@ trait MLBRoutes extends HttpService {
           path("fantasy") {
             parameters('team, 'year) { (team, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, year), List("Total", TeamMovingAverageWindow.toString + " Day"), Nil))
+                complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, YearFormatter.parseDateTime(year)), List("Total", TeamMovingAverageWindow.toString + " Day"), Nil))
               }
             }
           } ~
