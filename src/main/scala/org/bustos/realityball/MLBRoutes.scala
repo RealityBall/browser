@@ -73,7 +73,7 @@ trait MLBRoutes extends HttpService {
           path("fantasy") {
             parameters('team, 'year) { (team, year) =>
               respondWithMediaType(`application/json`) {
-                complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, YearFormatter.parseDateTime(year)), List("Total", TeamMovingAverageWindow.toString + " Day"), Nil))
+                complete(realityballData.dataNumericTable2(realityballData.teamFantasy(team, year), List("Total", TeamMovingAverageWindow.toString + " Day"), Nil))
               }
             }
           } ~
@@ -249,22 +249,6 @@ trait MLBRoutes extends HttpService {
               }
             }
           }
-      } ~
-      path("graph") {
-        parameters('team.?, 'player.?, 'year.?) { (team, player, year) =>
-          val teamStr = team.getOrElse("")
-          val playerStr = player.getOrElse("")
-          val yearStr = year.getOrElse("")
-          respondWithMediaType(`text/html`) {
-            if (!teamStr.isEmpty) {
-              complete(html.graph.render("", "").toString)
-            } else if (!playerStr.isEmpty && !yearStr.isEmpty) {
-              complete(html.graph.render(playerStr, yearStr).toString)
-            } else {
-              complete(html.graph.render("", "").toString)
-            }
-          }
-        }
       }
   }
 }
