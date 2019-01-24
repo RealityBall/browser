@@ -1,33 +1,51 @@
+/*
+
+    Copyright (C) 2016 Mauricio Bustos (m@bustos.org)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
 package org.bustos.realityball
 
-import org.specs2.mutable.Specification
-import spray.testkit.Specs2RouteTest
-import spray.http.StatusCodes._
-import spray.httpx.marshalling.ToResponseMarshallable.isMarshallable
-import spray.routing.Directive.pimpApply
-import scala.concurrent.duration.FiniteDuration
+import akka.actor.ActorSystem
+import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
+import org.scalatest.{Matchers, WordSpec}
 
-class TestMLB extends Specification with Specs2RouteTest with MLBRoutes {
+import scala.concurrent.duration._
+
+class TestMLB extends WordSpec with Matchers with ScalatestRouteTest with MLBRoutes {
   
   def actorRefFactory = system
-  
-  implicit val routeTestTimeout = RouteTestTimeout(FiniteDuration(5, "second"))
+
+  implicit def default(implicit system: ActorSystem) = RouteTestTimeout(5 seconds)
  
   "This service" should {
 
     "return a greeting for GET requests to the graph" in {
-      Get("/graph") ~> mlbRoutes ~> check {
-        responseAs[String] must contain("Retrosheet")
+      Get("/graph") ~> routes ~> check {
+        responseAs[String] should include("Retrosheet")
       }
     }
     "Identify the Tigers as a team in the league" in {
-      Get("/teams") ~> mlbRoutes ~> check {
-        responseAs[String] must contain("Tigers")
+      Get("/teams") ~> routes ~> check {
+        responseAs[String] should include("Tigers")
       }
     }
     "Identify Cabrera as a player on the Tigers" in {
-      Get("/players?team=DET") ~> mlbRoutes ~> check {
-        responseAs[String] must contain("Cabrera")
+      Get("/players?team=DET") ~> routes ~> check {
+        responseAs[String] should include("Cabrera")
       }
     }
   }

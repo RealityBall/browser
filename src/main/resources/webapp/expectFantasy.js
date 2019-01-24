@@ -12,9 +12,11 @@ $(document).ready(function(){
 		cache: false
 	}).done (function (predictions) {
 		$('#dateList').empty();
-		$.each(predictions, function(key, val) {
-		    $('#dateList').append('<li id=\"' + val + '\"><a href=\"#\">' + val + '</a></li>');
-		});
+		if (predictions.length > 0) {
+            $.each(predictions, function(key, val) {
+                $('#dateList').append('<li id=\"' + val + '\"><a href=\"#\">' + val + '</a></li>');
+            });
+        }
 		$('ul#dateList li').on('click', handleDateSelect);
 		$('ul#platformList li').on('click', handlePlatformSelect);
 	});
