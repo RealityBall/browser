@@ -18,8 +18,6 @@ val slf4j_version = "1.7.6"
 val akka_http_version = "10.0.11"
 
 val projectLibraries = Seq(
-    "com.typesafe.slick"      %% "slick"                % "3.2.1",
-    "com.typesafe.slick"      %% "slick-hikaricp"       % "3.2.1",
     "com.typesafe.akka"       %% "akka-actor"           % "2.4.20",
     "com.typesafe.akka"       %% "akka-http-core"       % akka_http_version,
     "com.typesafe.akka"       %% "akka-http"            % akka_http_version,

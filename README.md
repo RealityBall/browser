@@ -1,4 +1,4 @@
-Baseball Statistics Viewer
+RealityBall common library
 ==========================
 
-An application to view processed Retrosheet baseball data.  Data is stored in a MySQL database.  The table schema is available in the Slick table definitions class.
+[![Build Status](https://travis-ci.org/RealityBall/common.svg?branch=master)](https://travis-ci.org/RealityBall/common)
