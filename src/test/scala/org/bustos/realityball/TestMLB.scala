@@ -33,18 +33,13 @@ class TestMLB extends WordSpec with Matchers with ScalatestRouteTest with MLBRou
  
   "This service" should {
 
-    "return a greeting for GET requests to the graph" in {
-      Get("/graph") ~> routes ~> check {
-        responseAs[String] should include("Retrosheet")
-      }
-    }
     "Identify the Tigers as a team in the league" in {
-      Get("/teams") ~> routes ~> check {
+      Get("/teams?year=2018") ~> routes ~> check {
         responseAs[String] should include("Tigers")
       }
     }
     "Identify Cabrera as a player on the Tigers" in {
-      Get("/players?team=DET") ~> routes ~> check {
+      Get("/players?team=DET&year=2018") ~> routes ~> check {
         responseAs[String] should include("Cabrera")
       }
     }
