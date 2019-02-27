@@ -1,4 +1,4 @@
-RealityBall common library
-==========================
+RealityBall Statistics Web Browser
+==================================
 
-[![Build Status](https://travis-ci.org/RealityBall/common.svg?branch=master)](https://travis-ci.org/RealityBall/common)
+[![Build Status](https://travis-ci.org/RealityBall/browser.svg?branch=master)](https://travis-ci.org/RealityBall/browser)
