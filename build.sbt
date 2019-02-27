@@ -1,4 +1,4 @@
-
+import scala.util.Properties.envOrElse
 
 lazy val commonSettings = Seq(
    organization := "org.bustos",
@@ -6,7 +6,10 @@ lazy val commonSettings = Seq(
    scalaVersion := "2.11.7"
 )
 
-lazy val commons = ProjectRef(file("../common"), "common")
+lazy val commons = {
+    if (envOrElse("BUILD_ENV", "") == "") ProjectRef(uri("https://github.com/RealityBall/common.git"), "common")
+    else ProjectRef(file("../common"), "common")
+}
 
 lazy val browser = (project in file("."))
     .settings(name := "browser")
